@@ -2,4 +2,4 @@
 
 # JobBud to Find Work And Get Paid via CryptoCurrency
 
-JobBud is an finding work and earn cryptocurrency.
+JobBud is a web application that provides finding work and earning cryptocurrency.

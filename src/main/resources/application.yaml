@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:2985/jobbud
+    username: postgres
+    password: 6124358
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+
