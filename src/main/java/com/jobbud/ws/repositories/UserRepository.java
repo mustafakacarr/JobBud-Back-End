@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity,Long> {
     UserEntity findByUsernameAndPassword(String username, String password);
-    //This field is temporary, we will delete it later
+
 }

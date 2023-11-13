@@ -1,26 +1,22 @@
 package com.jobbud.ws.services;
 
 import com.jobbud.ws.entities.UserEntity;
+import com.jobbud.ws.entities.WalletEntity;
 import com.jobbud.ws.repositories.UserRepository;
+import com.jobbud.ws.repositories.WalletRepository;
 import com.jobbud.ws.requests.AuthRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.List;
-/*
-This is a service class. We will use it for business logics.
-Catch requests in controller and process them in service class.
-When you need db operations, use repository.
- */
 @Service
 public class UserService {
     private UserRepository userRepository;
+    private WalletRepository walletRepository;
 
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, WalletRepository walletRepository) {
         this.userRepository = userRepository;
+        this.walletRepository = walletRepository;
     }
 
     public List<UserEntity> getAllUsers() {
@@ -28,7 +24,13 @@ public class UserService {
     }
 
     public UserEntity createUser(UserEntity user) {
-        return userRepository.save(user);
+
+        UserEntity createdUser = userRepository.save(user);
+        if (createdUser != null) {
+            WalletEntity wallet = new WalletEntity(createdUser);
+            walletRepository.save(wallet);
+        }
+        return createdUser;
     }
 
 
@@ -41,9 +43,9 @@ public class UserService {
         UserEntity user = userRepository.findByUsernameAndPassword(authRequest.getUsername(), authRequest.getPassword());
         if (user != null) {
             return ResponseEntity.ok("User signed in");
-        }else {
+        } else {
             return ResponseEntity.badRequest().body("User not found");
         }
     }
 
-    }
+}
