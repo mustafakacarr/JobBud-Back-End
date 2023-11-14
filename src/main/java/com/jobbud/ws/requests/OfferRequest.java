@@ -1,14 +1,7 @@
 package com.jobbud.ws.requests;
 
-import com.jobbud.ws.entities.JobEntity;
-import com.jobbud.ws.entities.UserEntity;
-import com.jobbud.ws.enums.GeneralStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToOne;
+import com.jobbud.ws.enums.OfferStatus;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 public class OfferRequest {
@@ -16,6 +9,6 @@ public class OfferRequest {
     private String description;
     private long ownerId;
     private long jobId;
-    private final GeneralStatus status=GeneralStatus.OFFERED;
+    private final OfferStatus status=OfferStatus.OFFERED;
 }
 

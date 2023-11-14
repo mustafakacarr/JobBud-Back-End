@@ -1,6 +1,6 @@
 package com.jobbud.ws.entities;
 
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.OfferStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,5 +23,8 @@ public class OfferEntity {
     private JobEntity job;
     private final long datetime = new Date().getTime();
     @Enumerated(EnumType.STRING)
-    private GeneralStatus status;
+    private OfferStatus status;
+
+    private boolean isDeleted = false;
+
 }

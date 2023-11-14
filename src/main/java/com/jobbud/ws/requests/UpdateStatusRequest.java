@@ -1,9 +1,9 @@
 package com.jobbud.ws.requests;
 
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.UpdateStatus;
 import lombok.Data;
 
 @Data
 public class UpdateStatusRequest {
-private GeneralStatus status;
+private UpdateStatus status;
 }

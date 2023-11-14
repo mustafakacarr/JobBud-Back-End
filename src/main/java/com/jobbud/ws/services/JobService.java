@@ -24,14 +24,7 @@ public class JobService {
 
     public JobEntity addJob(JobRequest jobRequest) {
         JobEntity jobEntity = new JobEntity();
-        UserEntity owner=userRepository.findById(jobRequest.getOwnerId()).orElse(null);
-        jobEntity.setOwner(owner);
-        jobEntity.setLabel(jobRequest.getLabel());
-        jobEntity.setDescription(jobRequest.getDescription());
-        jobEntity.setBudget(jobRequest.getBudget());
-        jobEntity.setDeadline(jobRequest.getDeadline());
-        jobEntity.setStatus(jobRequest.getStatus());
-        return jobRepository.save(jobEntity);
+        return getJobEntity(jobRequest, jobEntity);
     }
 
     public JobEntity getJobById(long jobId) {
@@ -45,4 +38,30 @@ public class JobService {
             return jobRepository.findAll();
     }
 
+    public JobEntity updateJob(long jobId, JobRequest jobRequest) {
+        JobEntity jobEntity = jobRepository.findById(jobId).orElse(null);
+        if (jobEntity == null)
+            return null;
+        return getJobEntity(jobRequest, jobEntity);
+    }
+
+    private JobEntity getJobEntity(JobRequest jobRequest, JobEntity jobEntity) {
+        UserEntity owner=userRepository.findById(jobRequest.getOwnerId()).orElse(null);
+        jobEntity.setOwner(owner);
+        jobEntity.setLabel(jobRequest.getLabel());
+        jobEntity.setDescription(jobRequest.getDescription());
+        jobEntity.setBudget(jobRequest.getBudget());
+        jobEntity.setDeadline(jobRequest.getDeadline());
+        jobEntity.setStatus(jobRequest.getStatus());
+        return jobRepository.save(jobEntity);
+    }
+
+    public JobEntity softDeleteJob(long jobId) {
+        JobEntity jobEntity = jobRepository.findById(jobId).orElse(null);
+        if (jobEntity != null) {
+            jobEntity.setDeleted(true);
+            return jobRepository.save(jobEntity);
+        }
+        return null;
+    }
 }

@@ -4,7 +4,9 @@ import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.OfferEntity;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.entities.WorkEntity;
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.JobStatus;
+import com.jobbud.ws.enums.OfferStatus;
+import com.jobbud.ws.enums.UpdateStatus;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.OfferRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -36,7 +38,8 @@ public class OfferService {
         UserEntity owner = userRepository.findById(offerRequest.getOwnerId()).orElse(null);
         JobEntity job = jobRepository.findById(offerRequest.getJobId()).orElse(null);
 
-        if (job.getStatus() == GeneralStatus.WAITING_OFFERS) {
+
+        if (job.getStatus() == JobStatus.WAITING_OFFERS) {
             offer.setDescription(offerRequest.getDescription());
             offer.setStatus(offerRequest.getStatus());
             offer.setPrice(offerRequest.getPrice());
@@ -79,22 +82,28 @@ public class OfferService {
 
     public OfferEntity updateOfferStatus(long offerId, UpdateStatusRequest updateStatusRequest) {
         OfferEntity offer = offerRepository.findById(offerId).orElse(null);
-        GeneralStatus toChangeStatus = updateStatusRequest.getStatus();
+        UpdateStatus toChangeStatus = updateStatusRequest.getStatus();
         if (offer != null) {
-            if (toChangeStatus == GeneralStatus.ACCEPTED) {
-                offer.setStatus(GeneralStatus.ACCEPTED);
+            if (toChangeStatus == UpdateStatus.ACCEPTED) {
+                offer.setStatus(OfferStatus.ACCEPTED);
                 WorkEntity newWork = new WorkEntity(offer.getOwner(), offer.getJob(), null, 0);
                 workRepository.save(newWork);
-
-
-
-
                 return offerRepository.save(offer);
             } else {
-                offer.setStatus(toChangeStatus);
+                offer.setStatus(OfferStatus.DECLINED);
                 return offerRepository.save(offer);
             }
         }
         return null;
+    }
+
+    public OfferEntity softDeleteOffer(long offerId) {
+        OfferEntity offer = offerRepository.findById(offerId).orElse(null);
+        if (offer != null) {
+            offer.setDeleted(true);
+            return offerRepository.save(offer);
+        } else {
+            return null;
+        }
     }
 }

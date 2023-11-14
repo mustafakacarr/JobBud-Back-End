@@ -1,9 +1,8 @@
 package com.jobbud.ws.entities;
 
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.WorkStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.apache.catalina.User;
 
 @Entity
 @Data
@@ -19,14 +18,16 @@ public class WorkEntity {
     private String workContent;
     private long completedDate;
     @Enumerated(EnumType.STRING)
-    private GeneralStatus status;
+    private WorkStatus status;
+
+    private boolean isDeleted = false;
 
     public WorkEntity(UserEntity worker, JobEntity job, String workContent, long completedDate) {
         this.worker = worker;
         this.job = job;
         this.workContent = workContent;
         this.completedDate = completedDate;
-        this.status = GeneralStatus.WAITING_FINISH;
+        this.status = WorkStatus.WAITING_FINISH;
     }
 
     public WorkEntity() {

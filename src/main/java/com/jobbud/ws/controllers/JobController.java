@@ -3,6 +3,8 @@ package com.jobbud.ws.controllers;
 import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.requests.JobRequest;
 import com.jobbud.ws.services.JobService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,5 +32,21 @@ public class JobController {
     @GetMapping("/{jobId}")
     public JobEntity getJobs(@PathVariable long jobId) {
         return jobService.getJobById(jobId);
+    }
+
+    // edit
+    @PutMapping("/{jobId}")
+    public JobEntity updateJob(@PathVariable long jobId, JobRequest jobRequest) {
+        return jobService.updateJob(jobId, jobRequest);
+    }
+
+    @DeleteMapping("/{jobId}")
+    public ResponseEntity<String> softDeleteJob(@PathVariable long jobId) {
+        JobEntity deletedJob = jobService.softDeleteJob(jobId);
+        if (deletedJob != null) {
+            return ResponseEntity.ok("Job soft deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job not found");
+        }
     }
 }
