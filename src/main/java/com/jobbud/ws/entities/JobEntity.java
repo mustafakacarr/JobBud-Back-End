@@ -1,6 +1,6 @@
 package com.jobbud.ws.entities;
 
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.JobStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,6 +24,9 @@ public class JobEntity {
     private long deadline;
 
     @Enumerated(EnumType.STRING)
-    private GeneralStatus status;
+    private JobStatus status;
 
+
+    //soft delete
+    private boolean isDeleted = false;
 }

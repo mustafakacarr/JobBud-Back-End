@@ -5,6 +5,8 @@ import com.jobbud.ws.entities.OfferEntity;
 import com.jobbud.ws.requests.OfferRequest;
 import com.jobbud.ws.requests.UpdateStatusRequest;
 import com.jobbud.ws.services.OfferService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,6 +48,15 @@ public class OfferController {
         return offerService.updateOfferStatus(offerId, updateStatusRequest);
     }
 
-
+    // responseEntity is used to return http status codes
+    @DeleteMapping("/{offerId}")
+    public ResponseEntity<HttpStatus> deleteOffer(@PathVariable long offerId) {
+        try {
+            offerService.softDeleteOffer(offerId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

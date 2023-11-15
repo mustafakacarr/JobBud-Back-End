@@ -51,9 +51,23 @@ public class WorkService {
         else return workRepository.findAll();
 
     }
+
+    public WorkEntity updateWork(long workId, WorkRequest workRequest) {
+        WorkEntity workEntity = workRepository.findById(workId).orElse(null);
+        if (workEntity != null) {
+            workEntity.setWorkContent(workRequest.getWorkContent());
+            workEntity.setStatus(workRequest.getStatus());
+            workEntity.setCompletedDate(workRequest.getCompletedDate());
+            return workRepository.save(workEntity);
+        }
+        return null;
+    }
+    public WorkEntity softDeleteWork(long workId) {
+        WorkEntity workEntity = workRepository.findById(workId).orElse(null);
+        if (workEntity != null) {
+            workEntity.setDeleted(true);
+            return workRepository.save(workEntity);
+        }
+        return null;
+    }
 }
-
-
-// get all work
-// create work
-// get work

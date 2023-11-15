@@ -1,6 +1,6 @@
 package com.jobbud.ws.requests;
 
-import com.jobbud.ws.enums.GeneralStatus;
+import com.jobbud.ws.enums.JobStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +12,5 @@ public class JobRequest {
     private float budget;
     private long deadline;
     private long ownerId;
-    private GeneralStatus status;
+    private JobStatus status;
 }

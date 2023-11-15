@@ -3,6 +3,8 @@ package com.jobbud.ws.controllers;
 import com.jobbud.ws.entities.WorkEntity;
 import com.jobbud.ws.requests.WorkRequest;
 import com.jobbud.ws.services.WorkService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
@@ -33,5 +35,18 @@ public class WorkController {
         return workService.getWorkById(workId);
     }
 
-
+    // edit work
+    @PutMapping("/{workId}")
+    public WorkEntity updateWork(@PathVariable long workId, WorkRequest workRequest) {
+        return workService.updateWork(workId, workRequest);
+    }
+    @DeleteMapping("/{workId}")
+    public ResponseEntity<String> softDeleteWork(@PathVariable long workId) {
+        WorkEntity deletedWork = workService.softDeleteWork(workId);
+        if (deletedWork != null) {
+            return ResponseEntity.ok("Work soft deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Work not found");
+        }
+    }
 }

@@ -2,10 +2,7 @@ package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +24,8 @@ public class UserController {
     public UserEntity createUser(UserEntity user) {
         return userService.createUser(user);
     }
-
+    @PutMapping("/{userId}")
+    public UserEntity updateUser(@PathVariable long userId, UserEntity user) {
+        return userService.updateUser(userId, user);
+    }
 }

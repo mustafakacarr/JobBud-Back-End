@@ -1,0 +1,5 @@
+package com.jobbud.ws.enums;
+
+public enum WorkStatus {
+    WAITING_FINISH, WAITING_APPROVE, WAITING_OFFERS, REQUESTED_FINISH, REQUESTED_APPROVE, FINISHED, CANCELLED
+}

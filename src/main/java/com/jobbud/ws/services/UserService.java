@@ -48,4 +48,14 @@ public class UserService {
         }
     }
 
+    public UserEntity updateUser(long userId, UserEntity user) {
+        UserEntity userEntity = userRepository.findById(userId).orElse(null);
+        if (userEntity != null) {
+            userEntity.setUsername(user.getUsername());
+            userEntity.setPassword(user.getPassword());
+            userEntity.setEmail(user.getEmail());
+            return userRepository.save(userEntity);
+        }
+        return null;
+    }
 }
