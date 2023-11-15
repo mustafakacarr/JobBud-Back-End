@@ -85,6 +85,7 @@ public class OfferService {
         UpdateStatus toChangeStatus = updateStatusRequest.getStatus();
         if (offer != null) {
             if (toChangeStatus == UpdateStatus.ACCEPTED) {
+                //we need to change other offers' status to declined...
                 offer.setStatus(OfferStatus.ACCEPTED);
                 WorkEntity newWork = new WorkEntity(offer.getOwner(), offer.getJob(), null, 0);
                 workRepository.save(newWork);

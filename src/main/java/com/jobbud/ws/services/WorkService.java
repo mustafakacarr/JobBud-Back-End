@@ -46,7 +46,7 @@ public class WorkService {
     }
 
     public List<WorkEntity> getWorks(Optional<Long> workerId) {
-        if(workerId.isPresent())
+        if (workerId.isPresent())
             return workRepository.findAllByWorkerId(workerId.get());
         else return workRepository.findAll();
 
@@ -62,12 +62,12 @@ public class WorkService {
         }
         return null;
     }
-    public WorkEntity deleteWork(long workId) {
+
+    public void deleteWork(long workId) {
         WorkEntity workEntity = workRepository.findById(workId).orElse(null);
         if (workEntity != null) {
-            workEntity.setDeleted(true);
-            return workRepository.save(workEntity);
+            workRepository.delete(workEntity);
         }
-        return null;
+
     }
 }
