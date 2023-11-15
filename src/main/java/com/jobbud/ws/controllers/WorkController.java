@@ -21,12 +21,12 @@ public class WorkController {
     }
 
     @GetMapping
-    public List<WorkEntity> getWorks(@RequestParam Optional<Long> userId){
+    public List<WorkEntity> getWorks(@RequestParam Optional<Long> userId) {
         return workService.getWorks(userId);
-}
+    }
 
     @PostMapping
-    public WorkEntity createWork(WorkRequest workRequest){
+    public WorkEntity createWork(WorkRequest workRequest) {
         return workService.addWork(workRequest);
     }
 
@@ -40,13 +40,16 @@ public class WorkController {
     public WorkEntity updateWork(@PathVariable long workId, WorkRequest workRequest) {
         return workService.updateWork(workId, workRequest);
     }
+
     @DeleteMapping("/{workId}")
     public ResponseEntity<String> softDeleteWork(@PathVariable long workId) {
-        WorkEntity deletedWork = workService.softDeleteWork(workId);
-        if (deletedWork != null) {
-            return ResponseEntity.ok("Work soft deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Work not found");
+        try {
+            workService.deleteWork(workId);
+            return new ResponseEntity("Work successfully deleted", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+
     }
 }

@@ -97,13 +97,10 @@ public class OfferService {
         return null;
     }
 
-    public OfferEntity softDeleteOffer(long offerId) {
+    public void deleteOffer(long offerId) {
         OfferEntity offer = offerRepository.findById(offerId).orElse(null);
-        if (offer != null) {
-            offer.setDeleted(true);
-            return offerRepository.save(offer);
-        } else {
-            return null;
-        }
+        if (offer != null)
+            offerRepository.delete(offer);
+
     }
 }

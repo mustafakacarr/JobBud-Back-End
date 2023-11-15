@@ -49,11 +49,12 @@ public class OfferController {
     }
 
     // responseEntity is used to return http status codes
+    //Its an instance of soft deletion, wont delete it permanently
     @DeleteMapping("/{offerId}")
     public ResponseEntity<HttpStatus> deleteOffer(@PathVariable long offerId) {
         try {
-            offerService.softDeleteOffer(offerId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            offerService.deleteOffer(offerId);
+            return new ResponseEntity("Offer successfully deleted", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

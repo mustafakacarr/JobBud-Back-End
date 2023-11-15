@@ -1,6 +1,7 @@
 package com.jobbud.ws.services;
 
 import com.jobbud.ws.entities.JobEntity;
+import com.jobbud.ws.entities.OfferEntity;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -39,14 +40,16 @@ public class JobService {
     }
 
     public JobEntity updateJob(long jobId, JobRequest jobRequest) {
+        //We need to refactor this method with different request class later. Update and add requests should be different.
         JobEntity jobEntity = jobRepository.findById(jobId).orElse(null);
         if (jobEntity == null)
             return null;
         return getJobEntity(jobRequest, jobEntity);
     }
 
+
     private JobEntity getJobEntity(JobRequest jobRequest, JobEntity jobEntity) {
-        UserEntity owner=userRepository.findById(jobRequest.getOwnerId()).orElse(null);
+        UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElse(null);
         jobEntity.setOwner(owner);
         jobEntity.setLabel(jobRequest.getLabel());
         jobEntity.setDescription(jobRequest.getDescription());
@@ -56,12 +59,9 @@ public class JobService {
         return jobRepository.save(jobEntity);
     }
 
-    public JobEntity softDeleteJob(long jobId) {
-        JobEntity jobEntity = jobRepository.findById(jobId).orElse(null);
-        if (jobEntity != null) {
-            jobEntity.setDeleted(true);
-            return jobRepository.save(jobEntity);
-        }
-        return null;
+    public void deleteJob(long jobId) {
+        JobEntity job = jobRepository.findById(jobId).orElse(null);
+        if (job != null)
+            jobRepository.delete(job);
     }
 }

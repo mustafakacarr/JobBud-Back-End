@@ -62,7 +62,7 @@ public class WorkService {
         }
         return null;
     }
-    public WorkEntity softDeleteWork(long workId) {
+    public WorkEntity deleteWork(long workId) {
         WorkEntity workEntity = workRepository.findById(workId).orElse(null);
         if (workEntity != null) {
             workEntity.setDeleted(true);

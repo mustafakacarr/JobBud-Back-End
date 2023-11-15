@@ -42,11 +42,13 @@ public class JobController {
 
     @DeleteMapping("/{jobId}")
     public ResponseEntity<String> softDeleteJob(@PathVariable long jobId) {
-        JobEntity deletedJob = jobService.softDeleteJob(jobId);
-        if (deletedJob != null) {
-            return ResponseEntity.ok("Job soft deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job not found");
+        try {
+            jobService.deleteJob(jobId);
+            return new ResponseEntity("Job successfully deleted", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+
     }
 }
