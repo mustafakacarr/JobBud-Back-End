@@ -1,7 +1,8 @@
 package com.jobbud.ws.controllers;
 
-import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.requests.JobRequest;
+import com.jobbud.ws.requests.JobUpdateRequest;
+import com.jobbud.ws.responses.JobResponse;
 import com.jobbud.ws.services.JobService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,23 +21,23 @@ public class JobController {
     }
 
     @PostMapping
-    public JobEntity createJob(JobRequest jobRequest) {
+    public JobResponse createJob(JobRequest jobRequest) {
         return jobService.addJob(jobRequest);
     }
 
     @GetMapping
-    public List<JobEntity> getJobs(@RequestParam Optional<Long> ownerId) {
+    public List<JobResponse> getJobs(@RequestParam Optional<Long> ownerId) {
         return jobService.getJobs(ownerId);
     }
 
     @GetMapping("/{jobId}")
-    public JobEntity getJobs(@PathVariable long jobId) {
+    public JobResponse getJobs(@PathVariable long jobId) {
         return jobService.getJobById(jobId);
     }
 
     // edit
     @PutMapping("/{jobId}")
-    public JobEntity updateJob(@PathVariable long jobId, JobRequest jobRequest) {
+    public JobResponse updateJob(@PathVariable long jobId, JobUpdateRequest jobRequest) {
         return jobService.updateJob(jobId, jobRequest);
     }
 

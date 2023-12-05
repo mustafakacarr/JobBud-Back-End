@@ -1,6 +1,7 @@
 package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.UserEntity;
+import com.jobbud.ws.responses.UserResponse;
 import com.jobbud.ws.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,16 +17,16 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserEntity> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping
-    public UserEntity createUser(UserEntity user) {
+    public UserResponse createUser(UserEntity user) {
         return userService.createUser(user);
     }
     @PutMapping("/{userId}")
-    public UserEntity updateUser(@PathVariable long userId, UserEntity user) {
+    public UserResponse updateUser(@PathVariable long userId, UserEntity user) {
         return userService.updateUser(userId, user);
     }
 }

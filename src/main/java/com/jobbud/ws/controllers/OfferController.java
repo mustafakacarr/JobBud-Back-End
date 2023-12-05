@@ -1,9 +1,9 @@
 package com.jobbud.ws.controllers;
 
 
-import com.jobbud.ws.entities.OfferEntity;
 import com.jobbud.ws.requests.OfferRequest;
 import com.jobbud.ws.requests.UpdateStatusRequest;
+import com.jobbud.ws.responses.OfferResponse;
 import com.jobbud.ws.services.OfferService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,41 +15,42 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/v1.0/offers")
 public class OfferController {
-    private OfferService offerService;
+    private final OfferService offerService;
 
     public OfferController(OfferService offerService) {
         this.offerService = offerService;
     }
 
     @PostMapping
-    public OfferEntity createOffer(OfferRequest offerRequest) {
+    public OfferResponse createOffer(OfferRequest offerRequest) {
         return offerService.addOffer(offerRequest);
 
     }
 
     @GetMapping
-    public List<OfferEntity> getOffers(@RequestParam Optional<Long> ownerId, @RequestParam Optional<Long> jobId) {
+    public List<OfferResponse> getOffers(@RequestParam Optional<Long> ownerId, @RequestParam Optional<Long> jobId) {
         return offerService.getOffers(ownerId, jobId);
     }
 
     // id
     @GetMapping("/{offerId}")
-    public OfferEntity getOfferById(Long offerId) {
+    public OfferResponse getOfferById(@PathVariable Long offerId) {
         return offerService.getOfferById(offerId);
     }
 
     @PutMapping("/{offerId}")
-    public OfferEntity updateOfferStatus(@PathVariable long offerId, @RequestBody OfferRequest offerRequest) {
+    public OfferResponse updateOfferStatus(@PathVariable long offerId, @RequestBody OfferRequest offerRequest) {
         return offerService.updateOffer(offerId, offerRequest);
     }
 
+    // UPDATING STATUS OF OFFER (ACCEPTED OR REJECTED)
     @PutMapping("/{offerId}/status")
-    public OfferEntity updateOfferStatus(@PathVariable long offerId, @RequestBody UpdateStatusRequest updateStatusRequest) {
+    public OfferResponse updateOfferStatus(@PathVariable long offerId, @RequestBody UpdateStatusRequest updateStatusRequest) {
         return offerService.updateOfferStatus(offerId, updateStatusRequest);
     }
 
     // responseEntity is used to return http status codes
-    //Its an instance of soft deletion, wont delete it permanently
+    //It's an instance of soft deletion, won't delete it permanently
     @DeleteMapping("/{offerId}")
     public ResponseEntity<HttpStatus> deleteOffer(@PathVariable long offerId) {
         try {

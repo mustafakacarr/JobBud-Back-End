@@ -12,11 +12,15 @@ import com.jobbud.ws.repositories.OfferRepository;
 import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.repositories.WorkRepository;
 import com.jobbud.ws.requests.OfferRequest;
+import com.jobbud.ws.requests.PendingAmountRequest;
 import com.jobbud.ws.requests.UpdateStatusRequest;
+import com.jobbud.ws.responses.OfferResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferService {
@@ -25,19 +29,21 @@ public class OfferService {
     private JobRepository jobRepository;
     private WorkRepository workRepository;
 
-    public OfferService(OfferRepository offerRepository, UserRepository userRepository, JobRepository jobRepository, WorkRepository workRepository) {
+    private PendingAmountService pendingAmountService;
+
+    public OfferService(OfferRepository offerRepository, UserRepository userRepository, JobRepository jobRepository, WorkRepository workRepository, PendingAmountService pendingAmountService) {
         this.offerRepository = offerRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.workRepository = workRepository;
+        this.pendingAmountService = pendingAmountService;
     }
 
-    public OfferEntity addOffer(OfferRequest offerRequest) {
+    public OfferResponse addOffer(OfferRequest offerRequest) {
 
         OfferEntity offer = new OfferEntity();
         UserEntity owner = userRepository.findById(offerRequest.getOwnerId()).orElse(null);
         JobEntity job = jobRepository.findById(offerRequest.getJobId()).orElse(null);
-
 
         if (job.getStatus() == JobStatus.WAITING_OFFERS) {
             offer.setDescription(offerRequest.getDescription());
@@ -45,54 +51,76 @@ public class OfferService {
             offer.setPrice(offerRequest.getPrice());
             offer.setOwner(owner);
             offer.setJob(job);
-            return offerRepository.save(offer);
+            return new OfferResponse(offerRepository.save(offer));
         }
+
         return null;
 
     }
 
-    public OfferEntity getOfferById(long offerId) {
-        return offerRepository.findById(offerId).orElse(null);
+    public OfferResponse getOfferById(long offerId) {
+        OfferEntity offer = offerRepository.findById(offerId).orElse(null);
+        return new OfferResponse(offer);
     }
 
 
-    public List<OfferEntity> getOffers(Optional<Long> ownerId, Optional<Long> jobId) {
+    public List<OfferResponse> getOffers(Optional<Long> ownerId, Optional<Long> jobId) {
         if (ownerId.isPresent()) {
             if (jobId.isPresent()) {
-                return offerRepository.findAllByOwnerIdAndJobId(ownerId.get(), jobId.get());
+                return offerRepository.findAllByOwnerIdAndJobId(
+                        ownerId.get(), jobId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
+
             } else {
-                return offerRepository.findAllByOwnerId(ownerId.get());
+                return offerRepository.findAllByOwnerId(ownerId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
             }
         } else if (jobId.isPresent())
-            return offerRepository.findAllByJobId(jobId.get());
+            return offerRepository.findAllByJobId(jobId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
         else
-            return offerRepository.findAll();
+            return offerRepository.findAll().stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
     }
 
-    public OfferEntity updateOffer(long offerId, OfferRequest offerRequest) {
+    public OfferResponse updateOffer(long offerId, OfferRequest offerRequest) {
         OfferEntity offer = offerRepository.findById(offerId).orElse(null);
         if (offer != null) {
             offer.setDescription(offerRequest.getDescription());
             offer.setPrice(offerRequest.getPrice());
-            return offerRepository.save(offer);
-        } else {
+            return new OfferResponse(offerRepository.save(offer));
+        } else
             return null;
-        }
+
     }
 
-    public OfferEntity updateOfferStatus(long offerId, UpdateStatusRequest updateStatusRequest) {
-        OfferEntity offer = offerRepository.findById(offerId).orElse(null);
+    @Transactional
+    public OfferResponse updateOfferStatus(long offerId, UpdateStatusRequest updateStatusRequest) {
+        OfferEntity offerToChange = offerRepository.findById(offerId).orElse(null);
+        JobEntity relatedJob = offerToChange.getJob();
+        List<OfferEntity> allOffers = offerRepository.findAllByJobId(relatedJob.getId());
         UpdateStatus toChangeStatus = updateStatusRequest.getStatus();
-        if (offer != null) {
+        if (offerToChange != null) {
             if (toChangeStatus == UpdateStatus.ACCEPTED) {
-                //we need to change other offers' status to declined...
-                offer.setStatus(OfferStatus.ACCEPTED);
-                WorkEntity newWork = new WorkEntity(offer.getOwner(), offer.getJob(), null, 0);
-                workRepository.save(newWork);
-                return offerRepository.save(offer);
+                for (OfferEntity offer : allOffers) {
+                    if (offer.getId() != offerId) {
+                        offer.setStatus(OfferStatus.DECLINED);
+                    } else {
+                        offer.setStatus(OfferStatus.ACCEPTED);
+                        WorkEntity newWork = new WorkEntity(offer.getOwner(), offer.getJob(), null, 0);
+                        workRepository.save(newWork);
+                    }
+                }
+                offerRepository.saveAll(allOffers);
+                //We closed it to prevent multiple offers to be accepted and declined others.
+                // And we created empty work entity for accepted offer. By this way we can track the work.
+                relatedJob.setStatus(JobStatus.WAITING_FINISH);
+                jobRepository.save(relatedJob);
+                //Also we changed job status to waiting finish to prevent to get offers after accepting one of them.
+
+
+                pendingAmountService.addPendingAmount(new PendingAmountRequest(offerToChange.getOwner().getId(), offerToChange.getPrice(), offerToChange.getJob().getId()));
+
+                return getOfferById(offerId);
             } else {
-                offer.setStatus(OfferStatus.DECLINED);
-                return offerRepository.save(offer);
+                offerToChange.setStatus(OfferStatus.DECLINED);
+                return new OfferResponse(offerRepository.save(offerToChange));
             }
         }
         return null;

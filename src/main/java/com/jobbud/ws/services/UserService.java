@@ -5,9 +5,12 @@ import com.jobbud.ws.entities.WalletEntity;
 import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.repositories.WalletRepository;
 import com.jobbud.ws.requests.AuthRequest;
+import com.jobbud.ws.responses.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
     private UserRepository userRepository;
@@ -19,18 +22,17 @@ public class UserService {
         this.walletRepository = walletRepository;
     }
 
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll().stream().map(user->new UserResponse(user)).collect(Collectors.toList());
     }
 
-    public UserEntity createUser(UserEntity user) {
-
+    public UserResponse createUser(UserEntity user) {
         UserEntity createdUser = userRepository.save(user);
         if (createdUser != null) {
             WalletEntity wallet = new WalletEntity(createdUser);
             walletRepository.save(wallet);
         }
-        return createdUser;
+        return new UserResponse(createdUser);
     }
 
 
@@ -48,13 +50,13 @@ public class UserService {
         }
     }
 
-    public UserEntity updateUser(long userId, UserEntity user) {
+    public UserResponse updateUser(long userId, UserEntity user) {
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         if (userEntity != null) {
             userEntity.setUsername(user.getUsername());
             userEntity.setPassword(user.getPassword());
             userEntity.setEmail(user.getEmail());
-            return userRepository.save(userEntity);
+            return new UserResponse(userRepository.save(userEntity));
         }
         return null;
     }

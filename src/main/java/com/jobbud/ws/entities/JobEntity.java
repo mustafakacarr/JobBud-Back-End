@@ -21,7 +21,7 @@ public class JobEntity {
     private String label;
     private String description;
     private float budget;
-    @OneToOne
+    @ManyToOne
     private UserEntity owner;
 
     private final long createdDate = new Date().getTime();
