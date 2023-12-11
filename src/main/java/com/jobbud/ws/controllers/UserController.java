@@ -3,6 +3,7 @@ package com.jobbud.ws.controllers;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.responses.UserResponse;
 import com.jobbud.ws.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(UserEntity user) {
+    public UserResponse createUser(@Valid @RequestBody UserEntity user) {
         return userService.createUser(user);
     }
     @PutMapping("/{userId}")

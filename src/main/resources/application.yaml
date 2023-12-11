@@ -6,6 +6,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      javax:
+        persistence:
+          validation:
+            mode: none
 server:
   port: 8080
+
 

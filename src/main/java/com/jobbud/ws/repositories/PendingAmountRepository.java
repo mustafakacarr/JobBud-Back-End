@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PendingAmountRepository extends JpaRepository<PendingAmountEntity, Long> {
+    PendingAmountEntity findByJobId(long id);
 }

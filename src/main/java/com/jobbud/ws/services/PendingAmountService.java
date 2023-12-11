@@ -4,6 +4,7 @@ import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.PendingAmountEntity;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.entities.WalletEntity;
+import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.PendingAmountRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -28,13 +29,11 @@ public class PendingAmountService {
     public PendingAmountEntity addPendingAmount(PendingAmountRequest pendingAmountRequest){
         PendingAmountEntity pendingAmountEntity = new PendingAmountEntity();
         WalletEntity wallet=walletRepository.findByUserId(pendingAmountRequest.getUserId());
-        JobEntity job=jobRepository.findById(pendingAmountRequest.getJobId()).orElse(null);
+        JobEntity job=jobRepository.findById(pendingAmountRequest.getJobId()).orElseThrow(() -> new NotFoundException("Job not found"));
         pendingAmountEntity.setAmount(pendingAmountRequest.getAmount());
         pendingAmountEntity.setJob(job);
         pendingAmountEntity.setWallet(wallet);
        return pendingAmountRepository.save(pendingAmountEntity);
     }
-
-
 
 }

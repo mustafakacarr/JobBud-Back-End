@@ -1,5 +1,6 @@
 package com.jobbud.ws.entities;
 
+import com.jobbud.ws.annotations.UniqueUsername;
 import com.jobbud.ws.enums.UserType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,14 +20,15 @@ public class UserEntity {
     //auto is for auto increment, we could be had been using different something UUID(universal unique id) or else.
     private long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50,name = "username")
+    @UniqueUsername()
     //column annotation manages the column properties in table
     private String username;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100,name = "email")
     private String email;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100,name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)

@@ -1,13 +1,15 @@
 package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.WorkEntity;
-import com.jobbud.ws.requests.WorkRequest;
+import com.jobbud.ws.requests.WorkCreateRequest;
+import com.jobbud.ws.requests.WorkUpdateRequest;
+import com.jobbud.ws.requests.WorkUpdateStatusRequest;
+import com.jobbud.ws.responses.WorkResponse;
 import com.jobbud.ws.services.WorkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,24 +23,30 @@ public class WorkController {
     }
 
     @GetMapping
-    public List<WorkEntity> getWorks(@RequestParam Optional<Long> userId) {
+    public List<WorkResponse> getWorks(@RequestParam Optional<Long> userId) {
         return workService.getWorks(userId);
     }
 
     @PostMapping
-    public WorkEntity createWork(WorkRequest workRequest) {
-        return workService.addWork(workRequest);
+    public WorkEntity createWork(WorkCreateRequest workCreateRequest) {
+        return workService.addWork(workCreateRequest);
     }
 
     @GetMapping("/{workId}")
-    public WorkEntity getWorkById(@PathVariable long workId) {
+    public WorkResponse getWorkById(@PathVariable long workId) {
         return workService.getWorkById(workId);
     }
 
-    // edit work
+    // the requests that came here indicates that the work is completed
     @PutMapping("/{workId}")
-    public WorkEntity updateWork(@PathVariable long workId, WorkRequest workRequest) {
-        return workService.updateWork(workId, workRequest);
+    public WorkResponse updateWork(@PathVariable long workId, WorkUpdateRequest workUpdateRequest) {
+        return workService.updateWork(workId, workUpdateRequest);
+    }
+
+    //This request indicates that the work is approved or rejected by customer
+    @PutMapping("/{workId}/status")
+    public ResponseEntity<String> updateWorkStatus(@PathVariable long workId, WorkUpdateStatusRequest workUpdateStatusRequestRequest) {
+        return workService.updateWorkStatus(workId, workUpdateStatusRequestRequest);
     }
 
     @DeleteMapping("/{workId}")

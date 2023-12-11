@@ -2,6 +2,7 @@ package com.jobbud.ws.services;
 
 import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.UserEntity;
+import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.requests.JobRequest;
@@ -15,10 +16,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class JobService {
-
     private JobRepository jobRepository;
     private UserRepository userRepository;
-
 
     public JobService(JobRepository jobRepository, UserRepository userRepository) {
         this.jobRepository = jobRepository;
@@ -26,7 +25,7 @@ public class JobService {
     }
 
     public JobResponse addJob(JobRequest jobRequest) {
-        UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElse(null);
+        UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElseThrow(() -> new NotFoundException("User not found"));
         JobEntity jobEntity = new JobEntity();
         jobEntity.setOwner(owner);
         jobEntity.setLabel(jobRequest.getLabel());
@@ -34,12 +33,11 @@ public class JobService {
         jobEntity.setBudget(jobRequest.getBudget());
         jobEntity.setDeadline(jobRequest.getDeadline());
         jobEntity.setStatus(jobRequest.getStatus());
-
         return new JobResponse(jobRepository.save(jobEntity));
     }
 
     public JobResponse getJobById(long jobId) {
-        JobEntity job = jobRepository.findById(jobId).orElse(null);
+        JobEntity job = jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
         return new JobResponse(job);
     }
 
@@ -51,20 +49,16 @@ public class JobService {
     }
 
     public JobResponse updateJob(long jobId, JobUpdateRequest jobRequest) {
-        JobEntity jobEntity = jobRepository.findById(jobId).orElse(null);
-        if (jobEntity == null)
-            return null;
+        JobEntity jobEntity = jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
         jobEntity.setLabel(jobRequest.getLabel());
         jobEntity.setDescription(jobRequest.getDescription());
         jobEntity.setBudget(jobRequest.getBudget());
         jobEntity.setDeadline(jobRequest.getDeadline());
-
         return new JobResponse(jobRepository.save(jobEntity));
     }
 
-
     public void deleteJob(long jobId) {
-        JobEntity job = jobRepository.findById(jobId).orElse(null);
+        JobEntity job = jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
         if (job != null)
             jobRepository.delete(job);
     }

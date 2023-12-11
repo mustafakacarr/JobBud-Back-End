@@ -1,14 +1,14 @@
 package com.jobbud.ws.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jobbud.ws.enums.WorkStatus;
 import lombok.Data;
 
 @Data
-public class WorkRequest {
-    private long workerId;
-    private long jobId;
+public class WorkUpdateRequest {
     private String workContent;
     private long completedDate;
-    private WorkStatus status;
+    @JsonIgnore
+    private final WorkStatus status=WorkStatus.WAITING_APPROVE;
 
 }

@@ -2,7 +2,7 @@ package com.jobbud.ws.controllers;
 
 
 import com.jobbud.ws.requests.OfferRequest;
-import com.jobbud.ws.requests.UpdateStatusRequest;
+import com.jobbud.ws.requests.UpdateOfferStatusRequest;
 import com.jobbud.ws.responses.OfferResponse;
 import com.jobbud.ws.services.OfferService;
 import org.springframework.http.HttpStatus;
@@ -45,8 +45,8 @@ public class OfferController {
 
     // UPDATING STATUS OF OFFER (ACCEPTED OR REJECTED)
     @PutMapping("/{offerId}/status")
-    public OfferResponse updateOfferStatus(@PathVariable long offerId, @RequestBody UpdateStatusRequest updateStatusRequest) {
-        return offerService.updateOfferStatus(offerId, updateStatusRequest);
+    public OfferResponse updateOfferStatus(@PathVariable long offerId, @RequestBody UpdateOfferStatusRequest updateOfferStatusRequest) {
+        return offerService.updateOfferStatus(offerId, updateOfferStatusRequest);
     }
 
     // responseEntity is used to return http status codes

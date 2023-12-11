@@ -15,9 +15,9 @@ public class WorkEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private long id;
-    @OneToOne
+    @ManyToOne
     private UserEntity worker;
-    @OneToOne
+    @ManyToOne
     private JobEntity job;
     private String workContent;
     private long completedDate;
