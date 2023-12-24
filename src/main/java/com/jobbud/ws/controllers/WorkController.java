@@ -6,6 +6,7 @@ import com.jobbud.ws.requests.WorkUpdateRequest;
 import com.jobbud.ws.requests.WorkUpdateStatusRequest;
 import com.jobbud.ws.responses.WorkResponse;
 import com.jobbud.ws.services.WorkService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1.0/works")
+@SecurityRequirement(name = "JobBud Auth with Jwt")
 public class WorkController {
     private WorkService workService;
 

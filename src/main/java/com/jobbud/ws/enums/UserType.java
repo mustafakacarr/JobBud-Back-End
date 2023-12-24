@@ -1,6 +1,15 @@
 package com.jobbud.ws.enums;
 
-public enum UserType {
+import org.springframework.security.core.GrantedAuthority;
+
+;
+
+public enum UserType implements GrantedAuthority {
     FREELANCER,
-    CUSTOMER
+    CUSTOMER;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

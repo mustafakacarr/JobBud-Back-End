@@ -2,10 +2,12 @@ package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.WalletEntity;
 import com.jobbud.ws.services.WalletService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1.0/wallets")
+@SecurityRequirement(name = "JobBud Auth with Jwt")
 public class WalletController {
 
     private WalletService walletService;

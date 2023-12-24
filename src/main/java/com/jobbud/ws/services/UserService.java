@@ -30,25 +30,19 @@ public class UserService {
 
     public UserResponse createUser(UserEntity user) {
         UserEntity createdUser = userRepository.save(user);
+
         if (createdUser != null) {
+
             WalletEntity wallet = new WalletEntity(createdUser);
             walletRepository.save(wallet);
         }
         return new UserResponse(createdUser);
+
+    }
+    public UserEntity getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
-
-    /*
-     * This method is used to login a user
-     * !!! We will change it later with oauth (JWT authentication) !!!
-     * Its temporary for now.
-     */
-    public ResponseEntity<String> login(AuthRequest authRequest) {
-        UserEntity user = userRepository.findByUsernameAndPassword(authRequest.getUsername(), authRequest.getPassword());
-        if (user != null) {
-            return ResponseEntity.ok("User signed in");
-        }else throw new NotFoundException("User not found");
-    }
 
     public UserResponse updateUser(long userId, UserEntity user) {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));

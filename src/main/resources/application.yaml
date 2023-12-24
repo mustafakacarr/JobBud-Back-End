@@ -1,4 +1,13 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 705299589792-fm8rrpdgtjh8gg3gvlkna20h574r8kr1.apps.googleusercontent.com
+            client-secret: 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
+            scope: openid,profile,email,https://www.googleapis.com/auth/youtube.readonly
+            redirect-uri: http://localhost:8080/api/v1.0/microtransactions/oauth2/youtube/callback
   datasource:
     url: jdbc:mysql://mustafakacar.com.tr:3306/mustaf90_jobbud
     username: mustaf90_jobbud
@@ -11,7 +20,20 @@ spring:
         persistence:
           validation:
             mode: none
-server:
-  port: 8080
+
+  main:
+    allow-bean-definition-overriding: true
+  server:
+    port: 8080
 
 
+logging:
+  level:
+    com.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+    org.springframework.web: TRACE
+
+
+jobbud.app.secret: jobBudVerySecretKeyAndItHasToKeepToBe0001
+jobbud.expires.in: 36000000
+refresh.token.expires.in: 604800

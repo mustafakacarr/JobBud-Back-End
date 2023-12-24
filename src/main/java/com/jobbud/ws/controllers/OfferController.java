@@ -5,6 +5,7 @@ import com.jobbud.ws.requests.OfferRequest;
 import com.jobbud.ws.requests.UpdateOfferStatusRequest;
 import com.jobbud.ws.responses.OfferResponse;
 import com.jobbud.ws.services.OfferService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1.0/offers")
+@SecurityRequirement(name = "JobBud Auth with Jwt")
 public class OfferController {
     private final OfferService offerService;
 
