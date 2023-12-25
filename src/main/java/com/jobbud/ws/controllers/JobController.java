@@ -27,6 +27,11 @@ public class JobController {
         return jobService.addJob(jobRequest);
     }
 
+    @GetMapping("/search")
+    public List<JobResponse> searchJobs(@RequestParam String query) {
+        return jobService.searchJobs(query);
+    }
+
     @GetMapping
     public List<JobResponse> getJobs(@RequestParam Optional<Long> ownerId) {
         return jobService.getJobs(ownerId);

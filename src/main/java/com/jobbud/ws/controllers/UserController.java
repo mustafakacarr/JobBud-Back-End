@@ -5,6 +5,7 @@ import com.jobbud.ws.responses.UserResponse;
 import com.jobbud.ws.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<String> publicEndpoint() {
+        return ResponseEntity.ok("Public endpoint");
     }
 
     @GetMapping

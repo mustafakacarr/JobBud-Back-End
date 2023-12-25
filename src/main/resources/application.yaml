@@ -1,5 +1,8 @@
+google-api-key: ${google-api-key}
 
 spring:
+  mvc:
+    log-request-details: true
   security:
     oauth2:
       client:
@@ -8,7 +11,8 @@ spring:
             client-id: ${google-client-id}
             client-secret: ${google-client-secret}
             scope: openid,profile,email,https://www.googleapis.com/auth/youtube.readonly
-            redirect-uri: http://localhost:8080/api/v1.0/microtransactions/oauth2/youtube/callback
+            redirect-uri: ${google-redirect-uri}
+
   datasource:
     url: ${db-datasource-url}
     username: ${db-username}
@@ -32,11 +36,8 @@ spring:
 
 logging:
   level:
-    com.springframework.security: TRACE
-    org.springframework.security.oauth2: TRACE
-    org.springframework.web: TRACE
+    com.springframework.security: DEBUG
 
-
-jobbud.app.secret: jobBudVerySecretKeyAndItHasToKeepToBe0001
-jobbud.expires.in: 36000000
-refresh.token.expires.in: 604800
+jobbud.app.secret: postyAppVerySecretKeyAndItHasToKeepToBe0001
+jobbud.expires.in: 360000
+refresh.token.expires.in: 6048000

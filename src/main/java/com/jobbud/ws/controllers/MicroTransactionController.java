@@ -1,8 +1,15 @@
 package com.jobbud.ws.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.jobbud.ws.entities.MicroTransactionEntity;
+import com.jobbud.ws.helper.YoutubeHelper;
+import com.jobbud.ws.repositories.UserRepository;
+import com.jobbud.ws.requests.GetChannelIdRequest;
+import com.jobbud.ws.requests.MicroTransactionCompleteRequest;
+import com.jobbud.ws.requests.MicroTransactionCreateRequest;
+import com.jobbud.ws.services.MicroTransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,31 +18,41 @@ import java.net.URISyntaxException;
 @RestController
 @RequestMapping("/api/v1.0/microtransactions")
 public class MicroTransactionController {
+
+    //forChannelId will be customer's channel id
+    private YoutubeHelper youtubeHelper;
+    private MicroTransactionService microTransactionService;
+
+    private UserRepository userRepository;
+
+    @Autowired
+    public MicroTransactionController(YoutubeHelper youtubeHelper, MicroTransactionService microTransactionService, UserRepository userRepository) {
+        this.youtubeHelper = youtubeHelper;
+        this.microTransactionService = microTransactionService;
+        this.userRepository = userRepository;
+    }
+
+
     @GetMapping("/oauth2/youtube/clientUrl")
-    public String getClientUrl(){
-      //we will return url that will redirect user to youtube consent screen
-        //Also redirect uri will change to our frontend url like localhost:3000/oAuth2/initCall/
-        //Related this page will sent code to the endpoint that "/oauth2/youtube/callback"
-        return "";
+    public String getConsentUrl() {
+        return youtubeHelper.getConsentScreenUrl();
     }
 
-    @GetMapping("/oauth2/youtube/callback")
-    public String getAccessTokenViaCode() {
-      /*
-      Sent post request to 	https://oauth2.googleapis.com/token with body that contains code and other required fields
-      get access token from response and send it to checkIfUserSubscribed() method
-       */
+    @PostMapping("/oauth2/youtube/callback")
+    public ResponseEntity<String> completeMicroTransaction(@RequestBody MicroTransactionCompleteRequest microTransactionCompleteRequest) throws IOException, URISyntaxException, InterruptedException {
+      return microTransactionService.completeMicroTransaction(microTransactionCompleteRequest);
 
-       return "";
     }
-    public String checkIfUserSubscribed(String accessToken) throws IOException, URISyntaxException {
-        //we will send get request to youtube api with access token and get user info
 
-        //then we will save necessary info to our database
+    @PostMapping("/create")
+    public MicroTransactionEntity addMicroTransaction(@RequestBody MicroTransactionCreateRequest microTransactionCreateRequest) throws IOException, URISyntaxException {
+       return microTransactionService.addMicroTransaction(microTransactionCreateRequest);
+    }
 
+    @PostMapping("/findChannelId")
+    public ResponseEntity<String> findChannelId(@RequestBody GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
+     return microTransactionService.findChannelId(getChannelIdRequest);
 
-        //NOTE FOR MYSELF: DONT FORGET TO CHANGE API SETTINGS ABOUT ALLOWED USERS AND PUBLISHING STATUS
-        return "";
     }
 
 }

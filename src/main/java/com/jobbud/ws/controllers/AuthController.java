@@ -87,13 +87,16 @@ public class AuthController {
         AuthResponse authResponse=new AuthResponse();
 
         RefreshToken refreshToken= refreshTokenService.getByUserId(refreshRequest.getUserId());
-        if(refreshToken.getToken().equals(refreshRequest.getRefreshToken())&& !refreshTokenService.isRefreshExpired(refreshToken)){
+
+        if(refreshToken.getToken().equals(refreshRequest.getRefreshToken()) && !refreshTokenService.isRefreshExpired(refreshToken)){
+
             UserEntity user=refreshToken.getUser();
             String jwtToken = jwtTokenProvider.generateJwtTokenByUserId(user.getId());
             authResponse.setMessage("Token successfully refreshed.");
             authResponse.setAccessToken("Bearer " + jwtToken);
             authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
             authResponse.setUserId(user.getId());
+
             return new ResponseEntity<>(authResponse, HttpStatus.OK);
 
         }else {

@@ -14,7 +14,7 @@ import java.util.Date;
 public class JwtTokenProvider {
     @Value("${jobbud.app.secret}")
     private String APP_SECRET;
-
+   // Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     @Value("${jobbud.expires.in}")
     private long EXPIRES_IN;
 
@@ -22,11 +22,11 @@ public class JwtTokenProvider {
     public String generateJwtToken(Authentication auth) {
         JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
         Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
         return Jwts.builder()
                 .setSubject(Long.toString(userDetails.getId()))
                 .setIssuedAt(new Date()).setExpiration(expireDate)
-                .signWith(key).compact();
+                .signWith(SignatureAlgorithm.HS256,APP_SECRET).compact();
     }
     public String generateJwtTokenByUserId(long userId) {
 

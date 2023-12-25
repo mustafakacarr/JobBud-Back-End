@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -28,23 +29,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
+            System.out.println("JwtAuthenticationFilter: Filtre başlatıldı.");
             String jwtToken = extractJwtFromRequest(request);
+
             if (StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
                 Long id = jwtTokenProvider.getUserIdFromJwt(jwtToken);
                 UserDetails user = userDetailsService.loadUserById(id);
                 if (user != null) {
-
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    System.out.println("JwtAuthenticationFilter: Authentication başarıyla ayarlandı. Kullanıcı adı: " + user.getUsername());
                 }
             }
 
         } catch (Exception e) {
+            System.err.println("JwtAuthenticationFilter: Hata oluştu: " + e.getMessage());
             return;
+        } finally {
+            System.out.println("JwtAuthenticationFilter: Filtre tamamlandı.");
         }
+
         filterChain.doFilter(request, response);
     }
+
 
     private String extractJwtFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
@@ -52,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearer.substring("Bearer ".length());
         } else
             return null;
-
     }
 
 

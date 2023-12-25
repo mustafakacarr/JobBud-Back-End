@@ -88,8 +88,10 @@ public class OfferService {
         List<OfferEntity> allOffers = offerRepository.findAllByJobId(relatedJob.getId());
         OfferStatus toChangeStatus = updateOfferStatusRequest.getStatus();
         if (toChangeStatus == OfferStatus.ACCEPTED) {
+
             for (OfferEntity offer : allOffers) {
                 if (offer.getId() == offerId) {
+
                     offer.setStatus(OfferStatus.ACCEPTED);
                     //We created empty work instance on DB to track the work.
                     workService.addWork(new WorkCreateRequest(offer.getOwner().getId(), offer.getJob().getId(), null, 0));
@@ -105,6 +107,7 @@ public class OfferService {
             //Also we changed job status to waiting finish to prevent to get offers after accepting one of them.
 
             pendingAmountService.addPendingAmount(new PendingAmountRequest(offerToChange.getOwner().getId(), offerToChange.getPrice(), offerToChange.getJob().getId()));
+
             return getOfferById(offerId);
         } else {
             offerToChange.setStatus(OfferStatus.DECLINED);

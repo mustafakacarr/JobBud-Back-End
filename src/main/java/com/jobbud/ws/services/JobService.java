@@ -2,6 +2,7 @@ package com.jobbud.ws.services;
 
 import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.UserEntity;
+import com.jobbud.ws.entities.WalletEntity;
 import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -10,6 +11,7 @@ import com.jobbud.ws.requests.JobUpdateRequest;
 import com.jobbud.ws.responses.JobResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,22 +20,29 @@ import java.util.stream.Collectors;
 public class JobService {
     private JobRepository jobRepository;
     private UserRepository userRepository;
+    private WalletService walletService;
 
-    public JobService(JobRepository jobRepository, UserRepository userRepository) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository, WalletService walletService) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
+        this.walletService = walletService;
     }
 
     public JobResponse addJob(JobRequest jobRequest) {
         UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElseThrow(() -> new NotFoundException("User not found"));
-        JobEntity jobEntity = new JobEntity();
-        jobEntity.setOwner(owner);
-        jobEntity.setLabel(jobRequest.getLabel());
-        jobEntity.setDescription(jobRequest.getDescription());
-        jobEntity.setBudget(jobRequest.getBudget());
-        jobEntity.setDeadline(jobRequest.getDeadline());
-        jobEntity.setStatus(jobRequest.getStatus());
-        return new JobResponse(jobRepository.save(jobEntity));
+        WalletEntity walletOfOwner = walletService.getWalletByUserId(owner.getId());
+        if (walletOfOwner.getBalance() < jobRequest.getBudget())
+            return null;
+        else {
+            JobEntity jobEntity = new JobEntity();
+            jobEntity.setOwner(owner);
+            jobEntity.setLabel(jobRequest.getLabel());
+            jobEntity.setDescription(jobRequest.getDescription());
+            jobEntity.setBudget(jobRequest.getBudget());
+            jobEntity.setDeadline(jobRequest.getDeadline());
+            jobEntity.setStatus(jobRequest.getStatus());
+            return new JobResponse(jobRepository.save(jobEntity));
+        }
     }
 
     public JobResponse getJobById(long jobId) {
@@ -61,5 +70,14 @@ public class JobService {
         JobEntity job = jobRepository.findById(jobId).orElseThrow(() -> new NotFoundException("Job not found"));
         if (job != null)
             jobRepository.delete(job);
+    }
+
+    public List<JobResponse> searchJobs(String query) {
+        List<JobEntity> allJobs = jobRepository.findAll();
+
+        return allJobs.stream()
+                .filter(job -> job.getLabel().toLowerCase().contains(query.toLowerCase()) ||
+                        job.getDescription().toLowerCase().contains(query.toLowerCase()))
+                .map(job -> new JobResponse(job)).collect(Collectors.toList());
     }
 }

@@ -86,8 +86,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .cors()
                 .and()
-                .csrf().disable()
-                .oauth2Login(Customizer.withDefaults());;
+                .csrf().disable();;
 
 
         return http.build();

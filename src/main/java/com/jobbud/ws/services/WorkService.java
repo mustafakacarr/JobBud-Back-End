@@ -1,10 +1,7 @@
 package com.jobbud.ws.services;
 
 
-import com.jobbud.ws.entities.JobEntity;
-import com.jobbud.ws.entities.PendingAmountEntity;
-import com.jobbud.ws.entities.UserEntity;
-import com.jobbud.ws.entities.WorkEntity;
+import com.jobbud.ws.entities.*;
 import com.jobbud.ws.enums.JobStatus;
 import com.jobbud.ws.enums.WorkStatus;
 import com.jobbud.ws.exceptions.NotFoundException;
@@ -38,6 +35,7 @@ public class WorkService {
 
 
     public WorkEntity addWork(WorkCreateRequest workCreateRequest) {
+
         WorkEntity workEntity = new WorkEntity();
         UserEntity owner = userRepository.findById(workCreateRequest.getWorkerId()).orElseThrow(() -> new NotFoundException("User not found"));
         JobEntity job = jobRepository.findById(workCreateRequest.getJobId()).orElseThrow(() -> new NotFoundException("Job not found"));
@@ -50,6 +48,7 @@ public class WorkService {
 
         return workRepository.save(workEntity);
     }
+
 
     public WorkResponse getWorkById(long workId) {
         return new WorkResponse(workRepository.findById(workId).orElseThrow(() -> new NotFoundException("Work not found")));
@@ -87,8 +86,12 @@ public class WorkService {
             jobRepository.save(jobEntity);
             workRepository.save(workEntity);
 
+            pendingAmount= walletService.getPendingAmountInstance(jobEntity.getId());
             //Pending amount added to freelancer's wallet
-            walletService.addAmountFromPendingToWallet(workEntity.getWorker().getId(), workEntity.getJob().getId());
+            walletService.addAmountFromPendingToWallet(workEntity.getWorker().getId(), pendingAmount);
+
+            //Decrease pending amount from job owner
+            walletService.decreaseAmountFromWallet(walletService.getWalletByUserId(jobEntity.getOwner().getId()), pendingAmount.getAmount());
 
             return ResponseEntity.ok("Work successfully approved and related job status updated. Also pending amount transferred to worker wallet.");
         } else if (workUpdateStatusRequest.getStatus() == WorkStatus.REJECTED) {

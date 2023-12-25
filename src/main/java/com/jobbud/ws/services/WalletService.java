@@ -27,13 +27,25 @@ public class WalletService {
         return walletRepository.findById(walletId).orElseThrow(() -> new NotFoundException("Wallet not found"));
     }
 
-
-    public WalletEntity addAmountFromPendingToWallet(long walletOwnerId, long jobId) {
-        PendingAmountEntity pendingAmountEntity = pendingAmountRepository.findByJobId(jobId);
+    public WalletEntity addAmountForMicroWork(long walletOwnerId, float amount) {
         WalletEntity walletEntity = getWalletByUserId(walletOwnerId);
-        walletEntity.setBalance(walletEntity.getBalance() + pendingAmountEntity.getAmount());
-
-        pendingAmountRepository.delete(pendingAmountEntity);
+        walletEntity.setBalance(walletEntity.getBalance() + amount);
         return walletRepository.save(walletEntity);
+    }
+
+    public WalletEntity addAmountFromPendingToWallet(long walletOwnerId, PendingAmountEntity pendingAmount) {
+        WalletEntity walletEntity = getWalletByUserId(walletOwnerId);
+        walletEntity.setBalance(walletEntity.getBalance() + pendingAmount.getAmount());
+        pendingAmountRepository.delete(pendingAmount);
+        return walletRepository.save(walletEntity);
+    }
+
+    public PendingAmountEntity getPendingAmountInstance(long jobId) {
+        return pendingAmountRepository.findByJobId(jobId);
+    }
+
+    public WalletEntity decreaseAmountFromWallet(WalletEntity walllet, float amount) {
+        walllet.setBalance(walllet.getBalance() - amount);
+        return walletRepository.save(walllet);
     }
 }

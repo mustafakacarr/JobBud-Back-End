@@ -17,6 +17,7 @@ public class RefreshTokenService {
 
     RefreshTokenRepository refreshTokenRepository;
 
+
     @Value("${refresh.token.expires.in}")
     long expireSeconds;
 
