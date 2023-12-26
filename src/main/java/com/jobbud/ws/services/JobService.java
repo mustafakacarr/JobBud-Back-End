@@ -32,7 +32,7 @@ public class JobService {
         UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElseThrow(() -> new NotFoundException("User not found"));
         WalletEntity walletOfOwner = walletService.getWalletByUserId(owner.getId());
         if (walletOfOwner.getBalance() < jobRequest.getBudget())
-            return null;
+            throw new IllegalArgumentException("not enough balance in your wallet");
         else {
             JobEntity jobEntity = new JobEntity();
             jobEntity.setOwner(owner);

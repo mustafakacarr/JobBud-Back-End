@@ -14,12 +14,7 @@ import java.io.PrintWriter;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("text/plain");
-
-        try (PrintWriter writer = response.getWriter()) {
-            writer.write("Unauthorized: " + authException.getMessage());
-        }
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
 }

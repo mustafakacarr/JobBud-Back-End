@@ -6,6 +6,7 @@ import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.requests.GetChannelIdRequest;
 import com.jobbud.ws.requests.MicroTransactionCompleteRequest;
 import com.jobbud.ws.requests.MicroTransactionCreateRequest;
+import com.jobbud.ws.responses.ChannelIdResponse;
 import com.jobbud.ws.services.MicroTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class MicroTransactionController {
     }
 
     @PostMapping("/findChannelId")
-    public ResponseEntity<String> findChannelId(@RequestBody GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
+    public ChannelIdResponse findChannelId(@RequestBody GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
      return microTransactionService.findChannelId(getChannelIdRequest);
 
     }

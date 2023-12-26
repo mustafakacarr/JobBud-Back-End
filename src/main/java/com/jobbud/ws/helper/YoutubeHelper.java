@@ -49,7 +49,7 @@ public class YoutubeHelper {
         setApiKey(env.getProperty("google-api-key"));
         setRedirectUri(env.getProperty("google-redirect-uri"));
         setConsentScreenUrl("https://accounts.google.com/o/oauth2/v2/auth?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&response_type=code&scope=https://www.googleapis.com/auth/youtube&access_type=offline");
-    setClientSecret(env.getProperty("google-client-secret"));
+        setClientSecret(env.getProperty("google-client-secret"));
     }
 
 
@@ -61,7 +61,7 @@ public class YoutubeHelper {
     public String getAccessTokenViaCode(String code) throws IOException, InterruptedException, URISyntaxException {
         String requestEndpoint = "https://oauth2.googleapis.com/token";
         if (code.contains("%2F")) {
-            code= code.replace("%2F", "/");
+            code = code.replace("%2F", "/");
         }
         Map<String, String> data = new HashMap<>();
         data.put("code", code);
@@ -109,7 +109,7 @@ public class YoutubeHelper {
                 .uri(new URI(apiUrl))
                 .header("Authorization", "Bearer " + accessToken)
                 .build();
-        System.out.println("accesstoken "+ accessToken);
+        System.out.println("accesstoken " + accessToken);
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         // Parse the response
@@ -129,7 +129,7 @@ public class YoutubeHelper {
                     return true;
                 }
             }
-        }else {
+        } else {
             System.out.println(response.body());
         }
 
@@ -153,12 +153,17 @@ public class YoutubeHelper {
             JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
             JsonArray items = jsonResponse.getAsJsonArray("items");
 
-            if (items.size() > 0) {
-                String channelId = jsonResponse.getAsJsonArray("items")
+            if (items!=null) {
+                if(items.size()==0) throw new IllegalAccessError("No channel found");
+                JsonElement channelIdJSON = jsonResponse.getAsJsonArray("items")
                         .get(0).getAsJsonObject() // Get the first channel object
-                        .get("id").getAsString();
-                return channelId;
-            }
+                        .get("id");
+
+                if (channelIdJSON != null) {
+                    String channelId = channelIdJSON.getAsString();
+                    return channelId;
+                }
+            }else throw new IllegalAccessError("No channel found");
 
             System.out.println("Error: No items or invalid structure in the response.");
             return null;
@@ -168,5 +173,5 @@ public class YoutubeHelper {
         }
     }
 
-    }
+}
 

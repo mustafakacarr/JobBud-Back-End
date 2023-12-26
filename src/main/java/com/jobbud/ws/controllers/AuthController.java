@@ -54,6 +54,9 @@ public class AuthController {
         authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
         authResponse.setMessage("Authentication is succeed.");
         authResponse.setUserId(user.getId());
+        authResponse.setUsername(user.getUsername());
+        authResponse.setEmail(user.getEmail());
+        authResponse.setUserType(user.getUserType());
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
@@ -80,6 +83,9 @@ public class AuthController {
         authResponse.setAccessToken("Bearer " + jwtToken);
         authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
         authResponse.setUserId(user.getId());
+        authResponse.setUsername(user.getUsername());
+        authResponse.setEmail(user.getEmail());
+        authResponse.setUserType(user.getUserType());
         return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
     }
     @PostMapping("/refresh")
@@ -96,6 +102,9 @@ public class AuthController {
             authResponse.setAccessToken("Bearer " + jwtToken);
             authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
             authResponse.setUserId(user.getId());
+            authResponse.setUsername(user.getUsername());
+            authResponse.setEmail(user.getEmail());
+            authResponse.setUserType(user.getUserType());
 
             return new ResponseEntity<>(authResponse, HttpStatus.OK);
 

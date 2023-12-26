@@ -39,5 +39,5 @@ logging:
     com.springframework.security: DEBUG
 
 jobbud.app.secret: postyAppVerySecretKeyAndItHasToKeepToBe0001
-jobbud.expires.in: 360000
+jobbud.expires.in: 3600000
 refresh.token.expires.in: 6048000

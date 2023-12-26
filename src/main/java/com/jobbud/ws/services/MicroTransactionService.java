@@ -11,8 +11,10 @@ import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.requests.GetChannelIdRequest;
 import com.jobbud.ws.requests.MicroTransactionCompleteRequest;
 import com.jobbud.ws.requests.MicroTransactionCreateRequest;
+import com.jobbud.ws.responses.ChannelIdResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -34,6 +36,10 @@ public class MicroTransactionService {
     }
 
     public ResponseEntity<String> completeMicroTransaction(MicroTransactionCompleteRequest microTransactionCompleteRequest) throws IOException, URISyntaxException, InterruptedException {
+        MicroTransactionEntity microTransaction=microTransactionRepository.findById(microTransactionCompleteRequest.getMicroTransactionId()).orElse(null);
+        if(microTransaction.getNumberDone()==microTransaction.getQuota()){
+            return ResponseEntity.badRequest().body("this microtransaction quota is already completed");
+        }
         if (!microWorkRepository.existsByCompletedById(microTransactionCompleteRequest.getFreelancerId())) {
             MicroTransactionEntity microTransactionEntity = microTransactionRepository.findById(microTransactionCompleteRequest.getMicroTransactionId()).orElse(null);
             String code = microTransactionCompleteRequest.getCode();
@@ -57,7 +63,7 @@ public class MicroTransactionService {
     public MicroTransactionEntity addMicroTransaction(MicroTransactionCreateRequest microTransactionCreateRequest) {
         WalletEntity customerWallet = walletService.getWalletByUserId(microTransactionCreateRequest.getOwnerId());
         if (customerWallet.getBalance() < microTransactionCreateRequest.getBudget()) {
-            return null;
+            throw new IllegalArgumentException("not enough balance");
         } else {
             walletService.decreaseAmountFromWallet(customerWallet, microTransactionCreateRequest.getBudget());
 
@@ -74,9 +80,9 @@ public class MicroTransactionService {
 
     }
 
-    public ResponseEntity<String> findChannelId(GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
+    public ChannelIdResponse findChannelId(GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
         String accessToken = youtubeHelper.getAccessTokenViaCode(getChannelIdRequest.getCode());
         String channelId = youtubeHelper.getChannelId(accessToken);
-        return ResponseEntity.ok(channelId);
+        return new ChannelIdResponse(channelId);
     }
 }

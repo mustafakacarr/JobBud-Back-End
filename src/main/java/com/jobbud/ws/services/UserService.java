@@ -6,6 +6,7 @@ import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.repositories.WalletRepository;
 import com.jobbud.ws.requests.AuthRequest;
+import com.jobbud.ws.requests.UserUpdateRequest;
 import com.jobbud.ws.responses.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,17 +40,18 @@ public class UserService {
         return new UserResponse(createdUser);
 
     }
+
     public UserEntity getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
 
-    public UserResponse updateUser(long userId, UserEntity user) {
+    public UserResponse updateUser(long userId, UserUpdateRequest userRequest) {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-
-        userEntity.setUsername(user.getUsername());
-        userEntity.setPassword(user.getPassword());
-        userEntity.setEmail(user.getEmail());
+        if (userRequest.getEmail() != "")
+            userEntity.setEmail(userRequest.getEmail());
+        if (userRequest.getUsername() != "")
+            userEntity.setUsername(userRequest.getUsername());
         return new UserResponse(userRepository.save(userEntity));
 
     }

@@ -23,7 +23,7 @@ public class JobController {
     }
 
     @PostMapping
-    public JobResponse createJob(JobRequest jobRequest) {
+    public JobResponse createJob(@RequestBody JobRequest jobRequest) {
         return jobService.addJob(jobRequest);
     }
 
@@ -44,7 +44,7 @@ public class JobController {
 
     // edit
     @PutMapping("/{jobId}")
-    public JobResponse updateJob(@PathVariable long jobId, JobUpdateRequest jobRequest) {
+    public JobResponse updateJob(@PathVariable long jobId,@RequestBody JobUpdateRequest jobRequest) {
         return jobService.updateJob(jobId, jobRequest);
     }
 

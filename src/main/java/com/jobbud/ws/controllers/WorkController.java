@@ -47,7 +47,7 @@ public class WorkController {
 
     //This request indicates that the work is approved or rejected by customer
     @PutMapping("/{workId}/status")
-    public ResponseEntity<String> updateWorkStatus(@PathVariable long workId, WorkUpdateStatusRequest workUpdateStatusRequestRequest) {
+    public ResponseEntity<String> updateWorkStatus(@PathVariable long workId,@RequestBody WorkUpdateStatusRequest workUpdateStatusRequestRequest) {
         return workService.updateWorkStatus(workId, workUpdateStatusRequestRequest);
     }
 
