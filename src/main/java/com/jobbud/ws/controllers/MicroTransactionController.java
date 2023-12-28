@@ -7,6 +7,7 @@ import com.jobbud.ws.requests.GetChannelIdRequest;
 import com.jobbud.ws.requests.MicroTransactionCompleteRequest;
 import com.jobbud.ws.requests.MicroTransactionCreateRequest;
 import com.jobbud.ws.responses.ChannelIdResponse;
+import com.jobbud.ws.responses.MicroTransactionResponse;
 import com.jobbud.ws.services.MicroTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 
 @RestController
@@ -39,21 +41,37 @@ public class MicroTransactionController {
         return youtubeHelper.getConsentScreenUrl();
     }
 
-    @PostMapping("/oauth2/youtube/callback")
+    @PostMapping("/complete")
     public ResponseEntity<String> completeMicroTransaction(@RequestBody MicroTransactionCompleteRequest microTransactionCompleteRequest) throws IOException, URISyntaxException, InterruptedException {
-      return microTransactionService.completeMicroTransaction(microTransactionCompleteRequest);
+        return microTransactionService.completeMicroTransaction(microTransactionCompleteRequest);
 
     }
 
     @PostMapping("/create")
     public MicroTransactionEntity addMicroTransaction(@RequestBody MicroTransactionCreateRequest microTransactionCreateRequest) throws IOException, URISyntaxException {
-       return microTransactionService.addMicroTransaction(microTransactionCreateRequest);
+        return microTransactionService.addMicroTransaction(microTransactionCreateRequest);
     }
 
     @PostMapping("/findChannelId")
     public ChannelIdResponse findChannelId(@RequestBody GetChannelIdRequest getChannelIdRequest) throws IOException, URISyntaxException, InterruptedException {
-     return microTransactionService.findChannelId(getChannelIdRequest);
+        return microTransactionService.findChannelId(getChannelIdRequest);
 
+    }
+
+    @GetMapping()
+    public List<MicroTransactionResponse> getMicroTransactions() {
+        return microTransactionService.getMicroTransactions();
+    }
+
+    @GetMapping("/{microTransactionId}")
+    public MicroTransactionResponse getMicroTransactionById(@PathVariable long microTransactionId) {
+        return microTransactionService.getMicroTransactionById(microTransactionId);
+    }
+
+    @GetMapping("/{microTransactionId}/isCompleted")
+    public ResponseEntity<Boolean> isJobCompletedByCurrentUser(@PathVariable Long microTransactionId, @RequestParam Long freelancerId) {
+        boolean isCompletedByCurrentUser = microTransactionService.isJobCompletedByCurrentUser(microTransactionId, freelancerId);
+        return ResponseEntity.ok(isCompletedByCurrentUser);
     }
 
 }

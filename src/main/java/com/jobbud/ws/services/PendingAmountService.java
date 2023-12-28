@@ -15,20 +15,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class PendingAmountService {
     private PendingAmountRepository pendingAmountRepository;
-    private WalletRepository walletRepository;
+
+    private WalletService walletService;
     private JobRepository jobRepository;
     private UserRepository userRepository;
 
-    public PendingAmountService(PendingAmountRepository pendingAmountRepository, WalletRepository walletRepository, JobRepository jobRepository, UserRepository userRepository) {
+    public PendingAmountService(PendingAmountRepository pendingAmountRepository, WalletService walletService, JobRepository jobRepository, UserRepository userRepository) {
         this.pendingAmountRepository = pendingAmountRepository;
-        this.walletRepository = walletRepository;
+        this.walletService = walletService;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
     }
 
     public PendingAmountEntity addPendingAmount(PendingAmountRequest pendingAmountRequest){
         PendingAmountEntity pendingAmountEntity = new PendingAmountEntity();
-        WalletEntity wallet=walletRepository.findByUserId(pendingAmountRequest.getUserId());
+        WalletEntity wallet=walletService.getWalletByUserId(pendingAmountRequest.getUserId());
         JobEntity job=jobRepository.findById(pendingAmountRequest.getJobId()).orElseThrow(() -> new NotFoundException("Job not found"));
         pendingAmountEntity.setAmount(pendingAmountRequest.getAmount());
         pendingAmountEntity.setJob(job);

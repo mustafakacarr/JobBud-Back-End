@@ -16,7 +16,7 @@ public class MicroWorkEntity{
     private MicroTransactionEntity microTransaction;
 
     @ManyToOne
-    private UserEntity completedBy;
+    private UserEntity completedPerson;
 
     private long completedDate=new Date().getTime();
 }

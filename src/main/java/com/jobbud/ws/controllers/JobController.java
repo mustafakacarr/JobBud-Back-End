@@ -1,5 +1,6 @@
 package com.jobbud.ws.controllers;
 
+import com.jobbud.ws.enums.JobStatus;
 import com.jobbud.ws.requests.JobRequest;
 import com.jobbud.ws.requests.JobUpdateRequest;
 import com.jobbud.ws.responses.JobResponse;
@@ -33,8 +34,8 @@ public class JobController {
     }
 
     @GetMapping
-    public List<JobResponse> getJobs(@RequestParam Optional<Long> ownerId) {
-        return jobService.getJobs(ownerId);
+    public List<JobResponse> getJobs(@RequestParam Optional<Long> ownerId, @RequestParam Optional<JobStatus> jobStatus) {
+        return jobService.getJobs(ownerId,jobStatus);
     }
 
     @GetMapping("/{jobId}")

@@ -3,6 +3,7 @@ package com.jobbud.ws.services;
 import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.entities.WalletEntity;
+import com.jobbud.ws.enums.JobStatus;
 import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -50,11 +51,15 @@ public class JobService {
         return new JobResponse(job);
     }
 
-    public List<JobResponse> getJobs(Optional<Long> ownerId) {
-        if (ownerId.isPresent())
+    public List<JobResponse> getJobs(Optional<Long> ownerId, Optional<JobStatus> jobStatus) {
+
+        if (ownerId.isPresent() && jobStatus.isPresent())
+            return jobRepository.findAllByOwnerIdAndStatus(ownerId.get(), jobStatus.get()).stream().map(job -> new JobResponse(job)).collect(Collectors.toList());
+        else if (ownerId.isPresent())
             return jobRepository.findByOwnerId(ownerId.get()).stream().map(job -> new JobResponse(job)).collect(Collectors.toList());
-        else
-            return jobRepository.findAll().stream().map(job -> new JobResponse(job)).collect(Collectors.toList());
+        else if (jobStatus.isPresent())
+            return jobRepository.findAllByStatus(jobStatus.get()).stream().map(job -> new JobResponse(job)).collect(Collectors.toList());
+        return jobRepository.findAll().stream().map(job -> new JobResponse(job)).collect(Collectors.toList());
     }
 
     public JobResponse updateJob(long jobId, JobUpdateRequest jobRequest) {

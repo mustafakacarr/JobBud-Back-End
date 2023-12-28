@@ -1,6 +1,7 @@
 package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.WorkEntity;
+import com.jobbud.ws.enums.WorkStatus;
 import com.jobbud.ws.requests.WorkCreateRequest;
 import com.jobbud.ws.requests.WorkUpdateRequest;
 import com.jobbud.ws.requests.WorkUpdateStatusRequest;
@@ -25,8 +26,8 @@ public class WorkController {
     }
 
     @GetMapping
-    public List<WorkResponse> getWorks(@RequestParam Optional<Long> userId) {
-        return workService.getWorks(userId);
+    public List<WorkResponse> getWorks(@RequestParam Optional<Long> userId,@RequestParam Optional<WorkStatus> workStatus){
+        return workService.getWorks(userId,workStatus);
     }
 
     @PostMapping

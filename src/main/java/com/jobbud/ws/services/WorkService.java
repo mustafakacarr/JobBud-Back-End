@@ -54,9 +54,14 @@ public class WorkService {
         return new WorkResponse(workRepository.findById(workId).orElseThrow(() -> new NotFoundException("Work not found")));
     }
 
-    public List<WorkResponse> getWorks(Optional<Long> workerId) {
-        if (workerId.isPresent())
+    public List<WorkResponse> getWorks(Optional<Long> workerId, Optional<WorkStatus> workStatus) {
+        if (workerId.isPresent() && workStatus.isPresent())
+            return workRepository.findAllByWorkerIdAndStatus(workerId.get(), workStatus.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
+        else if (workerId.isPresent())
             return workRepository.findAllByWorkerId(workerId.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
+        else if (workStatus.isPresent())
+            return workRepository.findAllByStatus(workStatus.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
+
         else return workRepository.findAll().stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
 
     }
@@ -86,7 +91,7 @@ public class WorkService {
             jobRepository.save(jobEntity);
             workRepository.save(workEntity);
 
-            pendingAmount= walletService.getPendingAmountInstance(jobEntity.getId());
+            pendingAmount = walletService.getPendingAmountInstance(jobEntity.getId());
             //Pending amount added to freelancer's wallet
             walletService.addAmountFromPendingToWallet(workEntity.getWorker().getId(), pendingAmount);
 

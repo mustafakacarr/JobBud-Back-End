@@ -1,9 +1,12 @@
 package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.entities.WalletEntity;
+import com.jobbud.ws.responses.WalletHistoryResponse;
 import com.jobbud.ws.services.WalletService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1.0/wallets")
@@ -26,5 +29,9 @@ public class WalletController {
     }
 
 
+    @GetMapping("/{walletId}/history")
+    public List<WalletHistoryResponse> getWalletHistoryById(@PathVariable long walletId){
+        return walletService.getWalletHistory(walletId);
+    }
 
 }

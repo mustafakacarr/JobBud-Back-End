@@ -6,5 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MicroWorkRepository  extends JpaRepository<MicroWorkEntity,Long> {
-    boolean existsByCompletedById(long freelancerId);
+
+
+    boolean existsByCompletedPersonId(long freelancerId);
+
+    boolean existsByCompletedPersonIdAndMicroTransactionId(long freelancerId, Long microTransactionId);
 }
