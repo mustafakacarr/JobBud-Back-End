@@ -1,14 +1,10 @@
 package com.jobbud.ws.responses;
 
 import com.jobbud.ws.entities.WorkEntity;
-import com.jobbud.ws.services.OfferService;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Data
-
-public class WorkResponse {
+public class WorkWithOfferResponse {
 
 
     private long id;
@@ -17,17 +13,19 @@ public class WorkResponse {
     private String jobLabel;
     private String jobDescription;
     private float actualJobPrice;
+    private float acceptedOfferPrice;
     private String workContent;
     private long completedDate;
     private String status;
 
-    public WorkResponse(WorkEntity workEntity){
+    public WorkWithOfferResponse(WorkEntity workEntity, OfferResponse offerResponse){
         this.id=workEntity.getId();
         this.workerId=workEntity.getWorker().getId();
         this.jobId=workEntity.getJob().getId();
         this.jobLabel=workEntity.getJob().getLabel();
         this.jobDescription=workEntity.getJob().getDescription();
         this.actualJobPrice=workEntity.getJob().getBudget();
+        this.acceptedOfferPrice=offerResponse.getPrice();
         this.workContent=workEntity.getWorkContent();
         this.completedDate=workEntity.getCompletedDate();
         this.status=workEntity.getStatus().toString();

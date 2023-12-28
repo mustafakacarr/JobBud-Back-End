@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,9 +41,9 @@ public class MicroTransactionService {
     public ResponseEntity<String> completeMicroTransaction(MicroTransactionCompleteRequest microTransactionCompleteRequest) throws IOException, URISyntaxException, InterruptedException {
         MicroTransactionEntity microTransaction = microTransactionRepository.findById(microTransactionCompleteRequest.getMicroTransactionId()).orElse(null);
         if (microTransaction.getNumberDone() == microTransaction.getQuota()) {
-            return ResponseEntity.badRequest().body("this microtransaction quota is already completed");
+            throw new IllegalArgumentException("This microtransaction quota is already completed");
         }
-        if (!microWorkRepository.existsByCompletedPersonId(microTransactionCompleteRequest.getFreelancerId())) {
+        if (!microWorkRepository.existsByCompletedPersonIdAndMicroTransactionId(microTransactionCompleteRequest.getFreelancerId(), microTransactionCompleteRequest.getMicroTransactionId())) {
             MicroTransactionEntity microTransactionEntity = microTransactionRepository.findById(microTransactionCompleteRequest.getMicroTransactionId()).orElse(null);
             String code = microTransactionCompleteRequest.getCode();
             String accessToken = youtubeHelper.getAccessTokenViaCode(code);
@@ -52,14 +53,15 @@ public class MicroTransactionService {
                 microWork.setCompletedPerson(userRepository.findById(microTransactionCompleteRequest.getFreelancerId()).orElse(null));
                 microWork.setMicroTransaction(microTransactionEntity);
                 microWorkRepository.save(microWork);
-                walletService.addAmountForMicroWork(microTransactionEntity.getOwner().getId(), microTransactionEntity.getBudget() / microTransactionEntity.getQuota());
+                walletService.addAmountForMicroWork(microTransactionCompleteRequest.getFreelancerId(), microTransactionEntity.getBudget() / microTransactionEntity.getQuota());
 
-                return ResponseEntity.ok("user subscribed and amount will be transferred to freelancer. Freelancer earned " + (microTransactionEntity.getBudget() / microTransactionEntity.getQuota()) + " TL");
+                return ResponseEntity.ok("User subscribed and amount will be transferred to freelancer. Freelancer earned " + (microTransactionEntity.getBudget() / microTransactionEntity.getQuota()) + " TL");
             } else {
-                return ResponseEntity.badRequest().body("user not subscribed");
+                throw new IllegalArgumentException("You didn't subscribe to this channel");
 
             }
-        } else return ResponseEntity.badRequest().body("this microtransaction is already completed");
+        } else throw new IllegalArgumentException("You already completed this microtransaction");
+
     }
 
     public MicroTransactionEntity addMicroTransaction(MicroTransactionCreateRequest microTransactionCreateRequest) {
@@ -88,7 +90,9 @@ public class MicroTransactionService {
         return new ChannelIdResponse(channelId);
     }
 
-    public List<MicroTransactionResponse> getMicroTransactions() {
+    public List<MicroTransactionResponse> getMicroTransactions(Optional<Long> ownerId) {
+        if (ownerId.isPresent())
+            return microTransactionRepository.findAllByOwnerId(ownerId.get()).stream().map((microTransaction) -> new MicroTransactionResponse(microTransaction)).collect(Collectors.toList());
         return microTransactionRepository.findAll().stream().map((microTransaction) -> new MicroTransactionResponse(microTransaction)).collect(Collectors.toList());
     }
 
@@ -96,7 +100,7 @@ public class MicroTransactionService {
         return new MicroTransactionResponse(microTransactionRepository.findById(microTransactionId).orElse(null));
     }
 
-    public boolean isJobCompletedByCurrentUser(Long microTransactionId,long freelancerId) {
+    public boolean isJobCompletedByCurrentUser(Long microTransactionId, long freelancerId) {
         MicroTransactionEntity microTransaction = microTransactionRepository.findById(microTransactionId).orElse(null);
         if (microTransaction == null) {
             throw new IllegalArgumentException("microtransaction not found");

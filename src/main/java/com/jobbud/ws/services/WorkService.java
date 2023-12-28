@@ -6,12 +6,15 @@ import com.jobbud.ws.enums.JobStatus;
 import com.jobbud.ws.enums.WorkStatus;
 import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
+import com.jobbud.ws.repositories.OfferRepository;
 import com.jobbud.ws.repositories.UserRepository;
 import com.jobbud.ws.repositories.WorkRepository;
 import com.jobbud.ws.requests.WorkCreateRequest;
 import com.jobbud.ws.requests.WorkUpdateRequest;
 import com.jobbud.ws.requests.WorkUpdateStatusRequest;
+import com.jobbud.ws.responses.OfferResponse;
 import com.jobbud.ws.responses.WorkResponse;
+import com.jobbud.ws.responses.WorkWithOfferResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +28,14 @@ public class WorkService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final WalletService walletService;
+    private final OfferRepository offerRepository;
 
-    public WorkService(WorkRepository workRepository, JobRepository jobRepository, UserRepository userRepository, WalletService walletService) {
+    public WorkService(WorkRepository workRepository, JobRepository jobRepository, UserRepository userRepository, WalletService walletService, OfferRepository offerRepository) {
         this.workRepository = workRepository;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.walletService = walletService;
+        this.offerRepository = offerRepository;
     }
 
 
@@ -51,28 +56,60 @@ public class WorkService {
 
 
     public WorkResponse getWorkById(long workId) {
-        return new WorkResponse(workRepository.findById(workId).orElseThrow(() -> new NotFoundException("Work not found")));
+
+        WorkEntity work = workRepository.findById(workId).orElseThrow(() -> new NotFoundException("Work not found"));
+        return new WorkResponse(work);
     }
 
-    public List<WorkResponse> getWorks(Optional<Long> workerId, Optional<WorkStatus> workStatus) {
-        if (workerId.isPresent() && workStatus.isPresent())
-            return workRepository.findAllByWorkerIdAndStatus(workerId.get(), workStatus.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
-        else if (workerId.isPresent())
-            return workRepository.findAllByWorkerId(workerId.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
-        else if (workStatus.isPresent())
-            return workRepository.findAllByStatus(workStatus.get()).stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
+    public List<WorkWithOfferResponse> getWorks(Optional<Long> workerId, Optional<WorkStatus> workStatus) {
+        if (workerId.isPresent() && workStatus.isPresent()) {
+            return workRepository.findAllByWorkerIdAndStatus(workerId.get(), workStatus.get())
+                    .stream()
+                    .map(work -> {
+                        OfferResponse relatedOffer = new OfferResponse(offerRepository.findByOwnerIdAndJobId(work.getWorker().getId(), work.getJob().getId()));
 
-        else return workRepository.findAll().stream().map(work -> new WorkResponse(work)).collect(Collectors.toList());
+                        return new WorkWithOfferResponse(work, relatedOffer);
+                    })
+                    .collect(Collectors.toList());
+        } else if (workerId.isPresent()) {
+            return workRepository.findAllByWorkerId(workerId.get())
+                    .stream()
+                    .map(work -> {
+                        OfferResponse relatedOffer = new OfferResponse(offerRepository.findByOwnerIdAndJobId(work.getWorker().getId(), work.getJob().getId()));
 
+                        return new WorkWithOfferResponse(work, relatedOffer);
+                    })
+                    .collect(Collectors.toList());
+        } else if (workStatus.isPresent()) {
+            return workRepository.findAllByStatus(workStatus.get())
+                    .stream()
+                    .map(work -> {
+                        OfferResponse relatedOffer = new OfferResponse(offerRepository.findByOwnerIdAndJobId(work.getWorker().getId(), work.getJob().getId()));
+
+                        return new WorkWithOfferResponse(work, relatedOffer);
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            return workRepository.findAll()
+                    .stream()
+                    .map(work -> {
+                        OfferResponse relatedOffer = new OfferResponse(offerRepository.findByOwnerIdAndJobId(work.getWorker().getId(), work.getJob().getId()));
+
+                        return new WorkWithOfferResponse(work, relatedOffer);
+                    })
+                    .collect(Collectors.toList());
+        }
     }
+
 
     public WorkResponse updateWork(long workId, WorkUpdateRequest workUpdateRequest) {
+
         WorkEntity workEntity = workRepository.findById(workId).orElseThrow(() -> new NotFoundException("Work not found"));
 
         workEntity.setWorkContent(workUpdateRequest.getWorkContent());
         workEntity.setStatus(workUpdateRequest.getStatus());
         workEntity.setCompletedDate(workUpdateRequest.getCompletedDate());
-        return new WorkResponse(workEntity);
+        return new WorkResponse(workRepository.save(workEntity));
     }
 
     public void deleteWork(long workId) {
@@ -107,5 +144,15 @@ public class WorkService {
             return ResponseEntity.ok("Work rejected. And assigned work again to freelancer");
         }
         return ResponseEntity.badRequest().body("Work status not updated because of invalid status");
+    }
+
+    public WorkResponse getWorkByJobId( Optional<Long> jobId) {
+        WorkEntity work = workRepository.findByJobId( jobId.get());
+
+        if (work != null) {
+            return new WorkResponse(work);
+        } else
+            throw new NotFoundException("Work not found");
+
     }
 }

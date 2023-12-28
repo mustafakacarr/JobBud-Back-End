@@ -1,6 +1,7 @@
 package com.jobbud.ws.controllers;
 
 import com.jobbud.ws.enums.JobStatus;
+import com.jobbud.ws.exceptions.ApiError;
 import com.jobbud.ws.requests.JobRequest;
 import com.jobbud.ws.requests.JobUpdateRequest;
 import com.jobbud.ws.responses.JobResponse;

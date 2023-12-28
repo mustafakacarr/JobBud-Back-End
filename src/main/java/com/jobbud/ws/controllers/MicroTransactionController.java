@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -59,8 +60,8 @@ public class MicroTransactionController {
     }
 
     @GetMapping()
-    public List<MicroTransactionResponse> getMicroTransactions() {
-        return microTransactionService.getMicroTransactions();
+    public List<MicroTransactionResponse> getMicroTransactions(@RequestParam Optional<Long> ownerId) {
+        return microTransactionService.getMicroTransactions(ownerId);
     }
 
     @GetMapping("/{microTransactionId}")

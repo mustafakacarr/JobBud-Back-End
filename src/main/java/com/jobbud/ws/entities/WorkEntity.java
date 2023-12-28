@@ -17,7 +17,7 @@ public class WorkEntity {
     private long id;
     @ManyToOne
     private UserEntity worker;
-    @ManyToOne
+    @OneToOne
     private JobEntity job;
     private String workContent;
     private long completedDate;

@@ -22,4 +22,5 @@ public class WorkCreateRequest {
         this.workContent = workContent;
         this.completedDate = new Date().getTime();
     }
+
 }

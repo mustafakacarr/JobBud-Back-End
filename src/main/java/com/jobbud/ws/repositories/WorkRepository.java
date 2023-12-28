@@ -17,4 +17,10 @@ public interface WorkRepository extends JpaRepository<WorkEntity, Long> {
     List<WorkEntity> findAllByWorkerIdAndStatus(Long aLong, WorkStatus workStatus);
 
     List<WorkEntity> findAllByStatus(WorkStatus workStatus);
+
+
+
+    WorkEntity findByWorkerIdAndJobId(Long aLong, Long aLong1);
+
+    WorkEntity findByJobId(Long aLong);
 }

@@ -6,6 +6,7 @@ import com.jobbud.ws.requests.WorkCreateRequest;
 import com.jobbud.ws.requests.WorkUpdateRequest;
 import com.jobbud.ws.requests.WorkUpdateStatusRequest;
 import com.jobbud.ws.responses.WorkResponse;
+import com.jobbud.ws.responses.WorkWithOfferResponse;
 import com.jobbud.ws.services.WorkService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,14 @@ public class WorkController {
     }
 
     @GetMapping
-    public List<WorkResponse> getWorks(@RequestParam Optional<Long> userId,@RequestParam Optional<WorkStatus> workStatus){
-        return workService.getWorks(userId,workStatus);
+    public List<WorkWithOfferResponse> getWorks(@RequestParam Optional<Long> userId, @RequestParam Optional<WorkStatus> workStatus) {
+        return workService.getWorks(userId, workStatus);
+    }
+
+
+    @GetMapping("/detail")
+    public WorkResponse getWorkByWorkerIdAndJobId(@RequestParam Optional<Long> jobId) {
+        return workService.getWorkByJobId(jobId);
     }
 
     @PostMapping
@@ -40,15 +47,16 @@ public class WorkController {
         return workService.getWorkById(workId);
     }
 
+
     // the requests that came here indicates that the work is completed
     @PutMapping("/{workId}")
-    public WorkResponse updateWork(@PathVariable long workId, WorkUpdateRequest workUpdateRequest) {
+    public WorkResponse updateWork(@PathVariable long workId, @RequestBody WorkUpdateRequest workUpdateRequest) {
         return workService.updateWork(workId, workUpdateRequest);
     }
 
     //This request indicates that the work is approved or rejected by customer
     @PutMapping("/{workId}/status")
-    public ResponseEntity<String> updateWorkStatus(@PathVariable long workId,@RequestBody WorkUpdateStatusRequest workUpdateStatusRequestRequest) {
+    public ResponseEntity<String> updateWorkStatus(@PathVariable long workId, @RequestBody WorkUpdateStatusRequest workUpdateStatusRequestRequest) {
         return workService.updateWorkStatus(workId, workUpdateStatusRequestRequest);
     }
 

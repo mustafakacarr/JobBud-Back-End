@@ -4,6 +4,7 @@ import com.jobbud.ws.entities.JobEntity;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.entities.WalletEntity;
 import com.jobbud.ws.enums.JobStatus;
+import com.jobbud.ws.exceptions.ApiError;
 import com.jobbud.ws.exceptions.NotFoundException;
 import com.jobbud.ws.repositories.JobRepository;
 import com.jobbud.ws.repositories.UserRepository;
@@ -29,11 +30,11 @@ public class JobService {
         this.walletService = walletService;
     }
 
-    public JobResponse addJob(JobRequest jobRequest) {
+    public JobResponse addJob(JobRequest jobRequest) throws IllegalArgumentException {
         UserEntity owner = userRepository.findById(jobRequest.getOwnerId()).orElseThrow(() -> new NotFoundException("User not found"));
         WalletEntity walletOfOwner = walletService.getWalletByUserId(owner.getId());
         if (walletOfOwner.getBalance() < jobRequest.getBudget())
-            throw new IllegalArgumentException("not enough balance in your wallet");
+            throw new IllegalArgumentException("User does not have enough balance");
         else {
             JobEntity jobEntity = new JobEntity();
             jobEntity.setOwner(owner);

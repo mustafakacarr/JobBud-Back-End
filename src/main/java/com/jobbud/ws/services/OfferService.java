@@ -60,15 +60,13 @@ public class OfferService {
     }
 
     public List<OfferResponse> getOffers(Optional<Long> ownerId, Optional<Long> jobId) {
-        if (ownerId.isPresent()) {
-            if (jobId.isPresent()) {
-                return offerRepository.findAllByOwnerIdAndJobId(
-                        ownerId.get(), jobId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
-            } else {
-                return offerRepository.findAllByOwnerId(ownerId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
-            }
-        } else if (jobId.isPresent())
+        if (ownerId.isPresent() && jobId.isPresent())
+            return offerRepository.findAllByOwnerIdAndJobId(
+                    ownerId.get(), jobId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
+        else if (jobId.isPresent())
             return offerRepository.findAllByJobId(jobId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
+        else if (ownerId.isPresent())
+            return offerRepository.findAllByOwnerId(ownerId.get()).stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
         else
             return offerRepository.findAll().stream().map(offer -> new OfferResponse(offer)).collect(Collectors.toList());
     }
@@ -83,7 +81,6 @@ public class OfferService {
     @Transactional
     public OfferResponse updateOfferStatus(long offerId, UpdateOfferStatusRequest updateOfferStatusRequest) {
         OfferEntity offerToChange = offerRepository.findById(offerId).orElseThrow(() -> new NotFoundException("Offer not found"));
-
         JobEntity relatedJob = offerToChange.getJob();
         List<OfferEntity> allOffers = offerRepository.findAllByJobId(relatedJob.getId());
         OfferStatus toChangeStatus = updateOfferStatusRequest.getStatus();
@@ -91,9 +88,9 @@ public class OfferService {
 
             for (OfferEntity offer : allOffers) {
                 if (offer.getId() == offerId) {
-
                     offer.setStatus(OfferStatus.ACCEPTED);
                     //We created empty work instance on DB to track the work.
+
                     workService.addWork(new WorkCreateRequest(offer.getOwner().getId(), offer.getJob().getId(), null, 0));
 
                 } else {
@@ -118,6 +115,10 @@ public class OfferService {
 
     public void deleteOffer(long offerId) {
         OfferEntity offer = offerRepository.findById(offerId).orElseThrow(() -> new NotFoundException("Offer not found"));
-            offerRepository.delete(offer);
+        offerRepository.delete(offer);
+    }
+
+    public OfferResponse findOfferByOwnerIdAndJobId(long ownerId, long jobId) {
+        return new OfferResponse(offerRepository.findByOwnerIdAndJobId(ownerId, jobId));
     }
 }

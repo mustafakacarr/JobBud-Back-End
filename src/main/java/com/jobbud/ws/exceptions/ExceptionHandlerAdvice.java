@@ -27,4 +27,24 @@ public class ExceptionHandlerAdvice {
         return apiError;
 
     }
+
+
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+        public ApiError handleOtherExceptions(IllegalArgumentException illegalArgumentException, HttpServletRequest httpServletRequest) {
+            ApiError apiError = new ApiError(400, illegalArgumentException.getMessage(), httpServletRequest.getServletPath());
+
+            return apiError;
+
+        }
+        @ExceptionHandler({NotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+        public ApiError handleOtherExceptions(NotFoundException notFoundException, HttpServletRequest httpServletRequest) {
+            ApiError apiError = new ApiError(404, notFoundException.getMessage(), httpServletRequest.getServletPath());
+
+            return apiError;
+
+        }
+
 }
