@@ -39,6 +39,7 @@ public class OfferService {
     }
 
     public OfferResponse addOffer(OfferRequest offerRequest) {
+        System.out.println(offerRequest.getOwnerId());
         OfferEntity offer = new OfferEntity();
         UserEntity owner = userRepository.findById(offerRequest.getOwnerId()).orElseThrow(() -> new NotFoundException("User not found"));
         JobEntity job = jobRepository.findById(offerRequest.getJobId()).orElseThrow(() -> new NotFoundException("Job not found"));

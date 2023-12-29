@@ -24,7 +24,7 @@ public class OfferController {
     }
 
     @PostMapping
-    public OfferResponse createOffer(OfferRequest offerRequest) {
+    public OfferResponse createOffer(@RequestBody OfferRequest offerRequest) {
         return offerService.addOffer(offerRequest);
 
     }

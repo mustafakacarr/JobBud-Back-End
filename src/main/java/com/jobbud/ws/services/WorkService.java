@@ -143,7 +143,7 @@ public class WorkService {
             addWork(new WorkCreateRequest(workEntity.getWorker().getId(), workEntity.getJob().getId(), null, 0));
             return ResponseEntity.ok("Work rejected. And assigned work again to freelancer");
         }
-        return ResponseEntity.badRequest().body("Work status not updated because of invalid status");
+        throw new IllegalArgumentException("Work status not updated because of invalid status");
     }
 
     public WorkResponse getWorkByJobId( Optional<Long> jobId) {
