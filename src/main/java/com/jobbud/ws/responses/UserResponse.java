@@ -3,6 +3,7 @@ package com.jobbud.ws.responses;
 import com.jobbud.ws.entities.UserEntity;
 import com.jobbud.ws.enums.UserType;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 @Data
 public class UserResponse {
@@ -16,5 +17,17 @@ public class UserResponse {
         this.username = userEntity.getUsername();
         this.email = userEntity.getEmail();
         this.userType = userEntity.getUserType();
+    }
+
+    public HttpStatus getStatusCode() {
+        if (this.id == 0) {
+            return HttpStatus.BAD_REQUEST;
+        } else {
+            return HttpStatus.OK;
+        }
+    }
+
+    public UserResponse getBody() {
+        return this;
     }
 }
