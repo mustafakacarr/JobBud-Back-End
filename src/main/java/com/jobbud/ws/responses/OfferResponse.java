@@ -3,10 +3,11 @@ package com.jobbud.ws.responses;
 import com.jobbud.ws.entities.OfferEntity;
 import com.jobbud.ws.enums.OfferStatus;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 @Data
 public class OfferResponse {
-private long id;
+    private long id;
     private float price;
     private String description;
     private long datetime;
